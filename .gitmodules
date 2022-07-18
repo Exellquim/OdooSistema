@@ -1,0 +1,4 @@
+[submodule "Exellquim/OCA"]
+	path = Exellquim/OCA
+	url = git@github.com:Exellquim/OdooSistema.git
+	branch = 20220713
