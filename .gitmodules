@@ -2,3 +2,8 @@
 	path = Exellquim/OCA
 	url = git@github.com:Exellquim/OdooSistema.git
 	branch = 20220713
+
+[submodule "vantrybol/pw_invoice_payment_reconcile"]
+	path = vantrybol/pw_invoice_payment_reconcile
+	url = git@github.com:vantrybol/pw_invoice_payment_reconcile.git
+	branch = main
