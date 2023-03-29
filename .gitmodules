@@ -7,3 +7,8 @@
 	path = vantrybol/pw_invoice_payment_reconcile
 	url = git@github.com:vantrybol/pw_invoice_payment_reconcile.git
 	branch = main
+
+[submodule "OCA/server-backend"]
+	path = OCA/server-backend
+	url = git@github.com:OCA/server-backend.git
+	branch = 15.0
