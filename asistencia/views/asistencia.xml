@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_attendance_task_form_custom" model="ir.ui.view">
+        <field name="name">view_attendance_task_form_custom</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+		      <xpath expr="//field[@name='check_in']" position="after">
+               <field name="check2"/>
+               <field name="eat_in"/>
+               <field name="encuentros" invisible="1"/>
+               <field name="eat_out2"/>
+               <field name="encuentros_salida" invisible="1" />
+		      </xpath>
+        </field>
+        </record>
+
+        <record id="view_attendance_hora" model="ir.ui.view">
+        <field name="name">view_attendance_hora</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='check_out']" position="after">
+               <field name="horas_laborales" widget='float_time'/>
+               <field name="cambio" invisible="1" />
+               <field name="registros_por_empleado" invisible="1" />
+               <field name="boton" invisible="1"/>
+            </xpath>
+        </field>
+        </record>
+
+
+
+        <record id="view_name_inherited_check" model="ir.ui.view">
+        <field name="name">view_name_inherited_check</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+              <xpath expr="//field[@name='check_in']" position="attributes">
+                <attribute name="invisible">1</attribute>
+             </xpath>
+       </field>
+       </record>
+
+
+        <record id="view_name_inherited_works" model="ir.ui.view">
+        <field name="name">view_name_inherited_works</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+               <xpath expr="//field[@name='worked_hours']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+               </xpath>
+        </field>
+        </record>
+
+        <record id="view_tree_inherit" model="ir.ui.view">
+        <field name="name">view_tree_inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <button name="buscar_y_eliminar_registro_button" type="object" string="Actualizar" class="oe_highlight" invisible="1"/>
+            </xpath>
+        </field>
+        </record>
+
+    </data>
+</odoo>
+
+
+
+
+
+
+
