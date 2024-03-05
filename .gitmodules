@@ -22,3 +22,8 @@
 	path = OCA/account-invoicing
 	url = git@github.com:OCA/account-invoicing.git
 	branch = 15.0
+
+[submodule "Exellquim/OdooSistema"]
+	path = Exellquim/OdooSistema
+	url = git@github.com:Exellquim/OdooSistema.git
+	branch = 20230302
