@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+    <record id="stock_move_operations_inherit" model="ir.ui.view">
+    <field name="name">stock_move_operations_inherit</field>
+    <field name="model">stock.move</field>
+    <field name="inherit_id" ref="mrp.view_stock_move_operations_raw"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='quantity_done']" position="after">
+            <div class="row">
+                <div class="col-sm-6 mt-3">
+                     <button name="mostrar_lotes" string="Actualizar Lotes" type="object" class="btn btn-primary" attrs="{'invisible': [('button_pressed', '=', True)]}"/>
+                    <field name="button_pressed" invisible="1"/>
+                </div>
+            </div>
+        </xpath>
+    </field>
+    </record>
+    </data>
+</odoo>
