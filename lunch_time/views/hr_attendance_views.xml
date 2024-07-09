@@ -20,7 +20,6 @@
 <template id="attendance_page" name="Attendance Page">
     <t t-call="web.html_container">
         <t t-set="title">Comedor</t>
-        <t t-call-assets="web.assets_frontend"/>
         <!--<link rel="stylesheet" type="text/css" href="/lunch_time/static/src/css/attendance.css"/>-->
         <body style="background-image: url('/lunch_time/static/img/fondo.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <h4 style="color: white;">
