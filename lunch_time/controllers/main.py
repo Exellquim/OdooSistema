@@ -45,7 +45,7 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': (current_time - timedelta(hours=6)).strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': current_time,
             'message': message
         })
 
