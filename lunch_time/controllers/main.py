@@ -22,8 +22,11 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Obtener la hora actual y ajustar restando 6 horas
-        current_time = datetime.now() - timedelta(hours=6)
+        # Obtener la hora actual
+        current_time = datetime.now()
+
+        # Ajustar la hora restando 6 horas
+        adjusted_time = current_time - timedelta(hours=6)
 
         # Buscar registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
@@ -45,7 +48,8 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': current_time,
+            'current_time': adjusted_time,
             'message': message
         })
+
 
