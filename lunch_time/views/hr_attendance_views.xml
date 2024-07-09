@@ -19,43 +19,43 @@
 <!-- Template for the web page -->
 <template id="attendance_page" name="Attendance Page">
     <t t-call="web.html_container">
-        <t t-set="title" style="color: white;">Comedor</t>
+        <t t-set="title">Comedor</t>
         <t t-call-assets="web.assets_frontend"/>
         <link rel="stylesheet" type="text/css" href="/lunch_time/static/src/css/attendance.css"/>
         <body style="background-image: url('/lunch_time/static/img/fondo.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <h4 style="color: white;">
-                <div>
+                <div style="background-color: transparent;">
                     <span id="current-time">Cargando hora...</span>
                 </div>
             </h4>
             <center><h1 style="color: white;">Comedor</h1></center>
             <a href="https://exellquim-odoosistema-20240709-14115142.dev.odoo.com/web#cids=1&amp;action=830&amp;menu_id=591" style="position: absolute; top: 10px; right: 10px; color: white; font-size: 24px; text-decoration: none;">
-                     <i class="fa fa-window-close" aria-hidden="true"></i>
-                    </a>
-                <div style="background-color: #C08EC2; color: black; width: 40%; height: 320px; margin-top: 50px; margin-left: 0px; position: relative;">
-                    <!-- Botón de cerrar -->
+                <i class="fa fa-window-close" aria-hidden="true"></i>
+            </a>
+            <div style="background-color: #C08EC2; color: black; width: 40%; height: 320px; margin-top: 50px; margin-left: 0px; position: relative;">
+                <!-- Botón de cerrar -->
+                
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; background-color: transparent;">
+
+                    <!-- Icono de código de barras con línea roja -->
+                    <i class="fa fa-barcode" style="font-size: 68px; margin-bottom: 0px; position: relative;"></i>
+
+                    <!-- Contenido centrado -->
+                    <h3 style="color: white;">Escanea tu credencial</h3>
+                    <form id="scan-form" action="/lunch_time/submit" method="post" style="text-align: center;">
+                        <div class="form-group">
+                            <input type="text" name="barcode" id="barcode-input" placeholder="Ingresa tu credencial" />
+                        </div>
+                        <button type="submit" class="btn d-none">Enviar</button>
+                    </form>
                     
-                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
-
-                        <!-- Icono de código de barras con línea roja -->
-                        <i class="fa fa-barcode" style="font-size: 68px; margin-bottom: 0px; position: relative;"></i>
-
-                        <!-- Contenido centrado -->
-                        <h3 style="color: white;">Escanea tu credencial</h3>
-                        <form id="scan-form" action="/lunch_time/submit" method="post" style="text-align: center;">
-                            <div class="form-group">
-                                <input type="text" name="barcode" id="barcode-input" placeholder="Ingresa tu credencial" />
-                            </div>
-                            <button type="submit" class="btn d-none">Enviar</button>
-                        </form>
-                        
-                        <!-- Manejo de errores -->
-                        <t t-if="error">
-                            <p class="text-danger"><t t-esc="error"/></p>
-                        </t>
-                    </div>
+                    <!-- Manejo de errores -->
+                    <t t-if="error">
+                        <p class="text-danger"><t t-esc="error"/></p>
+                    </t>
                 </div>
-            
+            </div>
+        
         </body>
         <script type="text/javascript">
             // Función para enfocar automáticamente el input al cargar la página
@@ -89,7 +89,6 @@
         </script>
     </t>
 </template>
-
 
 
 <!-- Template for the web page -->
