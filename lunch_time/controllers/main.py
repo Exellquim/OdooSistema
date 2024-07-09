@@ -1,6 +1,7 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime, date
+import pytz  # Importa pytz para manejar zonas horarias
 
 class LunchTime(http.Controller):
 
@@ -22,10 +23,19 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Get current datetime
-        current_time = datetime.now()
+        # Obtén la hora actual en UTC
+        current_time_utc = datetime.utcnow()
 
-        # Search for today's attendance records for the employee
+        # Define la zona horaria deseada (por ejemplo, 'America/Mexico_City')
+        desired_timezone = pytz.timezone('America/Mexico_City')
+
+        # Convierte a la zona horaria deseada
+        current_time = current_time_utc.replace(tzinfo=pytz.utc).astimezone(desired_timezone)
+
+        # Formatea la fecha y hora en el formato deseado
+        formatted_time = current_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        # Busca los registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
             ('check_in', '>=', date.today())
@@ -45,6 +55,7 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': current_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': formatted_time,  # Usa la hora formateada en vez de current_time.strftime(...)
             'message': message
         })
+
