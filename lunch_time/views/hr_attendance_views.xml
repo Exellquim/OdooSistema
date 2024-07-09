@@ -22,7 +22,7 @@
         <t t-set="title">Comedor</t>
         <t t-call-assets="web.assets_frontend"/>
         <!--<link rel="stylesheet" type="text/css" href="/lunch_time/static/src/css/attendance.css"/>-->
-        <body style="background-image: url('/lunch_time/static/img/fondo.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <body>
             <h4 style="color: white;">
                 <div style="background-color: transparent;">
                     <span id="current-time">Cargando hora...</span>
