@@ -1,6 +1,6 @@
 from odoo import http
 from odoo.http import request
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 class LunchTime(http.Controller):
 
@@ -22,10 +22,10 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Get current datetime
-        current_time = datetime.now()
+        # Obtener la hora actual y ajustar restando 6 horas
+        current_time = datetime.now() - timedelta(hours=6)
 
-        # Search for today's attendance records for the employee
+        # Buscar registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
             ('check_in', '>=', date.today())
