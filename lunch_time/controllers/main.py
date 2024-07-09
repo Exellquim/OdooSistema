@@ -48,7 +48,7 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': adjusted_time,
+            'current_time': adjusted_time.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
 
