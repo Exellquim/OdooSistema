@@ -24,7 +24,7 @@
         <link rel="stylesheet" type="text/css" href="/lunch_time/static/src/css/attendance.css"/>
         <body style="background-image: url('/lunch_time/static/img/fondo.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <h4 style="color: white;">
-                <div class="current-time">
+                <div>
                     <span id="current-time">Cargando hora...</span>
                 </div>
             </h4>
