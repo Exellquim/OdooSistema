@@ -22,7 +22,6 @@
         <t t-set="title">Comedor</t>
         <t t-call-assets="web.assets_frontend"/>
         <!--<link rel="stylesheet" type="text/css" href="/lunch_time/static/src/css/attendance.css"/>-->
-        <div >
             <h4 style="color: white;">
                 <div style="background-color: transparent;">
                     <span id="current-time">Cargando hora...</span>
@@ -54,7 +53,6 @@
                         <p class="text-danger"><t t-esc="error"/></p>
                     </t>
                 </div>
-            </div>
         
         </div>
         <script type="text/javascript">
