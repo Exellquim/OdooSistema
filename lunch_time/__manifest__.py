@@ -7,6 +7,7 @@
     'category': 'Human Resources',
     'website': 'https://www.example.com',
     'depends': [
+        'base_setup',
         'base',               
         'hr_attendance',        
         'website'            
