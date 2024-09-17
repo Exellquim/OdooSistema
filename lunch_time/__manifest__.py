@@ -6,9 +6,7 @@
     'description': 'This module allows employees to manage their lunch times',
     'category': 'Human Resources',
     'website': 'https://www.example.com',
-    'depends': [
-        'base_setup',
-        'base',               
+    'depends': [             
         'hr_attendance',        
         'website'            
     ],
