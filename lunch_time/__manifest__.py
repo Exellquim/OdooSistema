@@ -21,10 +21,6 @@
             'lunch_time/static/src/css/attendance.css',  
         ],
     },
-    'demo': [],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
     'license': 'LGPL-3',  # Especifica la licencia para Odoo 17
     
 }
