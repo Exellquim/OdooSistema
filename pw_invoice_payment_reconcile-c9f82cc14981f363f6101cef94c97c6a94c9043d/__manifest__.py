@@ -15,10 +15,7 @@ This module allows you to partially or fully reconcile multiple invoices/bills d
         'views/account_payment_view.xml',  
     ],
     'price': 60.0,
-    'currency': 'EUR',
-    'application': True,
-    'installable': True,
-    'auto_install': False,  
+    'currency': 'EUR', 
     'live_test_url': 'https://youtu.be/M9UioY72xko',  
     'license': 'LGPL-3',  # Odoo 17 requiere especificar la licencia
     'images': ['static/description/Banner.png'], 
