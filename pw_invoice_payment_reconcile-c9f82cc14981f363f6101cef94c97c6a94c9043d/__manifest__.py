@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Multi Invoice Reconciliation | Invoice Partial Payment Reconcile Reconciliation',
-    'version': '1.0',
+    'version': '17.0.0.0.0',
     'author': 'Preway IT Solutions',
     'category': 'Accounting',
     'summary': 'Allows you to reconcile partial/full payments with multiple invoices/bills | Invoice Payment Reconciliation',
