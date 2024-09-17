@@ -5,6 +5,7 @@
     'author': 'Preway IT Solutions',
     'category': 'Accounting',
     'summary': 'Allows you to reconcile partial/full payments with multiple invoices/bills | Invoice Payment Reconciliation',
+    'sequence': 10,
     'description': """
 This module allows you to partially or fully reconcile multiple invoices/bills during payment.
     """,
