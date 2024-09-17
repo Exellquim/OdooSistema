@@ -8,7 +8,7 @@
     This module allows you to partially or fully reconcile multiple invoices/bills during payment.
     """,
     'category': 'Accounting',
-    'depends': ['base','account'],
+    'depends': ['base_setup','base','account'],
     'data': [
         'security/ir.model.access.csv', 
         'views/account_payment_view.xml',  
