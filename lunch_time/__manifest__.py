@@ -7,17 +7,17 @@
     'author': 'RADAXBS',
     'website': 'https://www.example.com',
     'depends': [
-        'base',                # Dependencia principal de Odoo
-        'hr_attendance',        # Módulo de asistencia de recursos humanos
-        'website',              # Funcionalidad de sitio web
+        'base',               
+        'hr_attendance',        
+        'website',              
     ],
     'data': [
-        'views/hr_attendance_views.xml',  # Verifica que las vistas sean compatibles
+        'views/hr_attendance_views.xml',
         'views/hr_attendance.xml',
     ],
     'assets': {
         'web.assets_frontend': [
-            'lunch_time/static/src/css/attendance.css',  # Asegúrate de que la ruta del asset es correcta
+            'lunch_time/static/src/css/attendance.css',  
         ],
     },
     'demo': [],
