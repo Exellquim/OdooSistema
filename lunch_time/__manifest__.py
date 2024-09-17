@@ -1,6 +1,6 @@
 {
     'name': 'Lunch Time',
-    'version': '17.0.0.0.0',
+    'version': '1.0',
     'summary': 'Module for managing lunch times',
     'sequence': 10,
     'description': 'This module allows employees to manage their lunch times',
