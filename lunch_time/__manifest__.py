@@ -13,12 +13,12 @@
         'website',              
     ],
     'data': [
-        'views/hr_attendance_views.xml',
-        'views/hr_attendance.xml',
+        #'views/hr_attendance_views.xml',
+        #'views/hr_attendance.xml',
     ],
     'assets': {
         'web.assets_frontend': [
-            'lunch_time/static/src/css/attendance.css',  
+            #'lunch_time/static/src/css/attendance.css',  
         ],
     },
     'license': 'LGPL-3',  # Especifica la licencia para Odoo 17
