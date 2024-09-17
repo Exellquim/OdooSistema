@@ -1,6 +1,6 @@
 {
     'name': 'Lunch Time',
-    'version': '1.0',
+    'version': '17.0.0.0.0',
     'summary': 'Module for managing lunch times',
     'description': 'This module allows employees to manage their lunch times',
     'category': 'Human Resources',
@@ -21,7 +21,6 @@
         ],
     },
     'demo': [],
-    'qweb': [],
     'installable': True,
     'application': True,
     'auto_install': False,
