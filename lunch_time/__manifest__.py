@@ -1,5 +1,3 @@
-# lunch_time/__manifest__.py
-
 {
     'name': 'Lunch Time',
     'version': '1.0',
@@ -8,14 +6,18 @@
     'category': 'Human Resources',
     'author': 'RADAXBS',
     'website': 'https://www.example.com',
-    'depends': ['base', 'hr_attendance', 'website'],
+    'depends': [
+        'base',                # Dependencia principal de Odoo
+        'hr_attendance',        # Módulo de asistencia de recursos humanos
+        'website',              # Funcionalidad de sitio web
+    ],
     'data': [
-        'views/hr_attendance_views.xml',
+        'views/hr_attendance_views.xml',  # Verifica que las vistas sean compatibles
         'views/hr_attendance.xml',
     ],
     'assets': {
         'web.assets_frontend': [
-            'lunch_time/static/src/css/attendance.css',
+            'lunch_time/static/src/css/attendance.css',  # Asegúrate de que la ruta del asset es correcta
         ],
     },
     'demo': [],
@@ -23,7 +25,9 @@
     'installable': True,
     'application': True,
     'auto_install': False,
+    'license': 'LGPL-3',  # Especifica la licencia para Odoo 17
 }
+
 
 
 
