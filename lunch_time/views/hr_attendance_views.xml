@@ -28,7 +28,7 @@
                 </div>
             </h4>
             <center><h1 style="color: white;">Comedor</h1></center>
-            <a href="https://exellquim-odoosistema.odoo.com/web#cids=1&amp;action=830&amp;menu_id=591" style="position: absolute; top: 10px; right: 10px; color: white; font-size: 24px; text-decoration: none;">
+            <a href="https://exellquim-odoosistema-20240917-2-15347053.dev.odoo.com/web#action=826&model=hr.attendance&view_type=gantt&cids=1&menu_id=595" style="position: absolute; top: 10px; right: 10px; color: white; font-size: 24px; text-decoration: none;">
                 <i class="fa fa-window-close" aria-hidden="true"></i>
             </a>
             <div style="background-color: #C08EC2; color: black; width: 40%; height: 320px; margin-top: 50px; margin-left: 0px; position: relative;">
