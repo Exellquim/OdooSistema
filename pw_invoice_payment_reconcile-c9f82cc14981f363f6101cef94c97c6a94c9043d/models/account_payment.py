@@ -50,7 +50,7 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).action_post()
         move_lines = self.env['account.move.line']
         rec_lines = self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0)
-        
+
         if rec_lines:
             for line in rec_lines:
                 invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
@@ -78,10 +78,45 @@ class AccountPayment(models.Model):
                             })
                     except Exception as e:
                         _logger.error(f"Error creating partial reconcile: {e}")
-                        self.create_payment(line)
+                        self.create_payment(line)  # Crear un pago si no se puede reconciliar
         
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
+        
         return res
+
+    def create_payment(self, line):
+        """Create a payment when reconciliation fails."""
+        invoice = line.invoice_id
+        if not invoice:
+            _logger.error("Invoice is not found for line: %s", line.id)
+            return
+
+        if not invoice.partner_bank_id:
+            _logger.error("No partner bank found for invoice: %s", invoice.id)
+            return
+
+        # Asegúrate de que el método de pago manual existe
+        payment_method = self.env.ref('account.account_payment_method_manual_in', raise_if_not_found=False)
+        if not payment_method:
+            _logger.error("Payment method 'Manual' not found.")
+            return
+        
+        payment_values = {
+            'payment_type': 'outbound' if self.partner_type == 'customer' else 'inbound',
+            'amount': abs(line.amount_paid),
+            'payment_date': fields.Date.today(),
+            'communication': invoice.name,
+            'partner_id': invoice.partner_id.id,  # Asegúrate de que el partner es el correcto
+            'partner_bank_id': invoice.partner_bank_id.id,
+            'payment_method_line_id': payment_method.id,
+            'invoice_ids': [(4, invoice.id)],  # Vincula el pago con la factura
+        }
+
+        payment = self.env['account.payment'].create(payment_values)
+        _logger.info(f"Payment created for invoice {invoice.id} with amount {line.amount_paid}.")
+
+        # Publicar el pago para que se procese
+        payment.action_post()
 
     def create_payment(self, line):
         """Create a payment in account.payment.register when reconciliation fails."""
