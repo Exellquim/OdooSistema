@@ -50,30 +50,56 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).action_post()
         move_lines = self.env['account.move.line']
         rec_lines = self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0)
+        
         if rec_lines:
             for line in rec_lines:
                 invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
                 payment_move = line.payment_id.move_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
+
                 move_lines |= (invoice_move + payment_move) 
+                
                 if invoice_move and payment_move and len(rec_lines) > 0:
-                    if self.partner_type == 'customer':
-                        rec = self.env['account.partial.reconcile'].create({
-                            'amount': abs(line.amount_paid),
-                            'debit_amount_currency': abs(line.amount_paid),
-                            'credit_amount_currency': abs(line.amount_paid),
-                            'debit_move_id': invoice_move.id,
-                            'credit_move_id': payment_move.id,
-                        })
-                    else:
-                        rec = self.env['account.partial.reconcile'].create({
-                            'amount': abs(line.amount_paid),
-                            'debit_amount_currency': abs(line.amount_paid),
-                            'credit_amount_currency': abs(line.amount_paid),
-                            'debit_move_id': payment_move.id,
-                            'credit_move_id': invoice_move.id,
-                        })
+                    try:
+                        if self.partner_type == 'customer':
+                            rec = self.env['account.partial.reconcile'].create({
+                                'amount': abs(line.amount_paid),
+                                'debit_amount_currency': abs(line.amount_paid),
+                                'credit_amount_currency': abs(line.amount_paid),
+                                'debit_move_id': invoice_move.id,
+                                'credit_move_id': payment_move.id,
+                            })
+                        else:
+                            rec = self.env['account.partial.reconcile'].create({
+                                'amount': abs(line.amount_paid),
+                                'debit_amount_currency': abs(line.amount_paid),
+                                'credit_amount_currency': abs(line.amount_paid),
+                                'debit_move_id': payment_move.id,
+                                'credit_move_id': invoice_move.id,
+                            })
+                    except Exception as e:
+                        _logger.error(f"Error creating partial reconcile: {e}")
+                        self.create_payment(line)
+        
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
         return res
+
+    def create_payment(self, line):
+        """Create a payment in account.payment.register when reconciliation fails."""
+        invoice = line.invoice_id
+        payment_method = self.env.ref('account.account_payment_method_manual_in')  # Ajusta esto según tu configuración de método de pago
+        
+        payment_values = {
+            'amount': abs(line.amount_paid),
+            'payment_date': fields.Date.today(),
+            'communication': invoice.name,  # Aquí puedes ajustar el campo de comunicación según lo necesites
+            'partner_bank_id': invoice.partner_bank_id.id,
+            'payment_method_line_id': payment_method.id,
+            'invoice_ids': [(4, invoice.id)],  # Enlaza el pago con la factura
+        }
+        
+        self.env['account.payment.register'].create(payment_values)
+        _logger.info(f"Payment created for invoice {invoice.id} with amount {line.amount_paid}.")
+
 
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
