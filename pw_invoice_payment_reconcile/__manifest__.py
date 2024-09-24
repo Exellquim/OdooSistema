@@ -20,4 +20,5 @@ This module is allow you to partial/full reconcile multiple invoice/bills on pay
     'live_test_url': 'https://youtu.be/M9UioY72xko',
     "license": "LGPL-3",
     "images":["static/description/Banner.png"],
+    
 }
