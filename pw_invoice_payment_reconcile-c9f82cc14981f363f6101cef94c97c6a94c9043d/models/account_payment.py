@@ -24,7 +24,7 @@ class AccountPayment(models.Model):
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': sum([payment['amount'] for line in move.line_ids for payment in line._get_reconciled_info_JSON()])
+                'already_paid': sum([payment['amount'] for line in move.line_ids for payment in line._get_reconciled_info_JSON()]),
                 #'already_paid': sum([payment['amount'] for payment in move._get_reconciled_info_JSON()]),
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
