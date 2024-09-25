@@ -58,10 +58,9 @@ class AccountPayment(models.Model):
                 payment_amount += line.amount_paid
         self.amount = payment_amount
 
-    @api.model
-    def action_post(self):
+    def action_post(self, *args, **kwargs):
         # Llamar a la implementación original de action_post
-        res = super(AccountPayment, self).action_post()
+        res = super(AccountPayment, self).action_post(*args, **kwargs)
 
         # Obtener las líneas de movimientos contables
         move_lines = self.env['account.move.line']
