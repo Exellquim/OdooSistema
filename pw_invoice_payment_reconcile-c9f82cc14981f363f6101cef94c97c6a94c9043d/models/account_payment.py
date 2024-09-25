@@ -24,7 +24,7 @@ class AccountPayment(models.Model):
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': sum([payment['amount'] for payment in move._get_reconciled_info_JSON_values()]),
+                'already_paid': sum([payment['amount'] for payment in move._get_reconciled_info_JSON()]),
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
@@ -80,7 +80,7 @@ class AccountPaymentReconcile(models.Model):
     def _check_full_deduction(self):
         if self.invoice_id:
             payment_ids = [payment['account_payment_id'] for payment in
-                           self.invoice_id._get_reconciled_info_JSON_values()]
+                           self.invoice_id._get_reconciled_info_JSON()]
             if payment_ids:
                 payments = self.env['account.payment'].browse(payment_ids)
                 return any([True if payment.tds_amt or payment.sales_tds_amt else False for payment in payments])
