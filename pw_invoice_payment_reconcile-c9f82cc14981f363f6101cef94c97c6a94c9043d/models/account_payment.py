@@ -12,26 +12,38 @@ class AccountPayment(models.Model):
     def _onchange_partner_id(self):
         if not self.partner_id:
             return
+
         partner_id = self.partner_id
-        self.reconcile_invoice_ids = [(5,)]
+        self.reconcile_invoice_ids = [(5,)]  # Elimina todas las reconciliaciones anteriores
+
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         moves = self.env['account.move'].sudo().search(
-            [('partner_id', '=', self.partner_id.id), ('state', '=', 'posted'),
+            [('partner_id', '=', self.partner_id.id),
+             ('state', '=', 'posted'),
              ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
              ('move_type', '=', move_type[self.payment_type])])
+
         vals = []
         for move in moves:
+            already_paid = 0.0
+            # Calculamos el total pagado a través de las reconciliaciones en las líneas contables
+            for line in move.line_ids:
+                # Sumar los pagos reconciliados en débitos y créditos
+                already_paid += sum(line.matched_debit_ids.mapped('amount')) + sum(line.matched_credit_ids.mapped('amount'))
+
+            # Agregar los valores de reconciliación de facturas a la lista
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': sum([payment['amount'] for line in move.line_ids for payment in line._get_reconciled_info_JSON()]),
-                #'already_paid': sum([payment['amount'] for payment in move._get_reconciled_info_JSON()]),
+                'already_paid': already_paid,  # Monto ya pagado
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
             }))
+
+        # Asignar los valores calculados a la línea de reconciliación
         self.reconcile_invoice_ids = vals
         self.partner_id = partner_id.id
         return
