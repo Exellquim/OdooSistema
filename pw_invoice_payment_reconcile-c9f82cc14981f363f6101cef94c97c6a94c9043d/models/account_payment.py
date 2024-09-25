@@ -8,7 +8,6 @@ class AccountPayment(models.Model):
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
 
-        
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
         if not self.partner_id:
@@ -25,7 +24,7 @@ class AccountPayment(models.Model):
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': move.amount_total - move.amount_residual,
+                'already_paid': sum([payment['amount'] for payment in move._get_reconciled_info_JSON_values()]),
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
@@ -50,91 +49,30 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).action_post()
         move_lines = self.env['account.move.line']
         rec_lines = self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0)
-
         if rec_lines:
             for line in rec_lines:
-                invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
-                payment_move = line.payment_id.move_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
-
+                invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.internal_type in ('payable', 'receivable'))
+                payment_move = line.payment_id.move_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.internal_type in ('payable', 'receivable'))
                 move_lines |= (invoice_move + payment_move) 
-                
                 if invoice_move and payment_move and len(rec_lines) > 0:
-                    try:
-                        if self.partner_type == 'customer':
-                            rec = self.env['account.partial.reconcile'].create({
-                                'amount': abs(line.amount_paid),
-                                'debit_amount_currency': abs(line.amount_paid),
-                                'credit_amount_currency': abs(line.amount_paid),
-                                'debit_move_id': invoice_move.id,
-                                'credit_move_id': payment_move.id,
-                            })
-                        else:
-                            rec = self.env['account.partial.reconcile'].create({
-                                'amount': abs(line.amount_paid),
-                                'debit_amount_currency': abs(line.amount_paid),
-                                'credit_amount_currency': abs(line.amount_paid),
-                                'debit_move_id': payment_move.id,
-                                'credit_move_id': invoice_move.id,
-                            })
-                    except Exception as e:
-                        _logger.error(f"Error creating partial reconcile: {e}")
-                        self.create_payment(line)  # Crear un pago si no se puede reconciliar
-        
+                    if self.partner_type == 'customer':
+                        rec = self.env['account.partial.reconcile'].create({
+                            'amount': abs(line.amount_paid),
+                            'debit_amount_currency': abs(line.amount_paid),
+                            'credit_amount_currency': abs(line.amount_paid),
+                            'debit_move_id': invoice_move.id,
+                            'credit_move_id': payment_move.id,
+                        })
+                    else:
+                        rec = self.env['account.partial.reconcile'].create({
+                            'amount': abs(line.amount_paid),
+                            'debit_amount_currency': abs(line.amount_paid),
+                            'credit_amount_currency': abs(line.amount_paid),
+                            'debit_move_id': payment_move.id,
+                            'credit_move_id': invoice_move.id,
+                        })
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
-        
         return res
-
-    def create_payment(self, line):
-        """Create a payment when reconciliation fails."""
-        invoice = line.invoice_id
-        if not invoice:
-            _logger.error("Invoice is not found for line: %s", line.id)
-            return
-
-        if not invoice.partner_bank_id:
-            _logger.error("No partner bank found for invoice: %s", invoice.id)
-            return
-
-        # Asegúrate de que el método de pago manual existe
-        payment_method = self.env.ref('account.account_payment_method_manual_in', raise_if_not_found=False)
-        if not payment_method:
-            _logger.error("Payment method 'Manual' not found.")
-            return
-        
-        payment_values = {
-            'payment_type': 'outbound' if self.partner_type == 'customer' else 'inbound',
-            'amount': abs(line.amount_paid),
-            'payment_date': fields.Date.today(),
-            'communication': invoice.name,
-            'partner_id': invoice.partner_id.id,  # Asegúrate de que el partner es el correcto
-            'partner_bank_id': invoice.partner_bank_id.id,
-            'payment_method_line_id': payment_method.id,
-            'invoice_ids': [(4, invoice.id)],  # Vincula el pago con la factura
-        }
-
-        payment = self.env['account.payment'].create(payment_values)
-        _logger.info(f"Payment created for invoice {invoice.id} with amount {line.amount_paid}.")
-
-        # Publicar el pago para que se procese
-        payment.action_post()
-
-    def create_payment(self, line):
-        """Create a payment in account.payment.register when reconciliation fails."""
-        invoice = line.invoice_id
-        payment_method = self.env.ref('account.account_payment_method_manual_in')  # Ajusta esto según tu configuración de método de pago
-        
-        payment_values = {
-            'amount': abs(line.amount_paid),
-            'payment_date': fields.Date.today(),
-            'communication': invoice.name,  # Aquí puedes ajustar el campo de comunicación según lo necesites
-            'partner_bank_id': invoice.partner_bank_id.id,
-            'payment_method_line_id': payment_method.id,
-            'invoice_ids': [(4, invoice.id)],  # Enlaza el pago con la factura
-        }
-        
-        self.env['account.payment.register'].create(payment_values)
-        _logger.info(f"Payment created for invoice {invoice.id} with amount {line.amount_paid}.")
-
 
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
