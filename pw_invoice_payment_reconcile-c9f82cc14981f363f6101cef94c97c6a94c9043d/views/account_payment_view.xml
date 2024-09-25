@@ -10,6 +10,7 @@
                     <page string="Invoice/Bills">
                         <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
+                                <field name="currency_id" invisible="1"/>
                                 <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
                                 <field name="amount_untaxed" readonly="1" force_save="1"/>
                                 <field name="amount_tax" readonly="1" force_save="1"/>
