@@ -58,15 +58,31 @@ class AccountPayment(models.Model):
                 payment_amount += line.amount_paid
         self.amount = payment_amount
 
+    @api.model
     def action_post(self):
+        # Llamar a la implementación original de action_post
         res = super(AccountPayment, self).action_post()
+
+        # Obtener las líneas de movimientos contables
         move_lines = self.env['account.move.line']
+        
+        # Filtrar las líneas de reconciliación con monto pagado
         rec_lines = self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0)
+        
         if rec_lines:
             for line in rec_lines:
-                invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.internal_type in ('payable', 'receivable'))
-                payment_move = line.payment_id.move_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.internal_type in ('payable', 'receivable'))
-                move_lines |= (invoice_move + payment_move) 
+                # Filtrar las líneas de la factura y del pago para cuentas por cobrar/pagar (usando 'account_type')
+                invoice_move = line.invoice_id.line_ids.filtered(
+                    lambda r: not r.reconciled and r.account_id.account_type in ('asset_receivable', 'liability_payable')
+                )
+                payment_move = line.payment_id.move_id.line_ids.filtered(
+                    lambda r: not r.reconciled and r.account_id.account_type in ('asset_receivable', 'liability_payable')
+                )
+
+                # Añadir las líneas de movimiento a la colección
+                move_lines |= (invoice_move + payment_move)
+
+                # Crear reconciliación parcial dependiendo del tipo de partner
                 if invoice_move and payment_move and len(rec_lines) > 0:
                     if self.partner_type == 'customer':
                         rec = self.env['account.partial.reconcile'].create({
@@ -84,9 +100,12 @@ class AccountPayment(models.Model):
                             'debit_move_id': payment_move.id,
                             'credit_move_id': invoice_move.id,
                         })
+            
+            # Reconciliar las líneas de movimientos no reconciliadas
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
-        return res
 
+        return res
+        
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
 
