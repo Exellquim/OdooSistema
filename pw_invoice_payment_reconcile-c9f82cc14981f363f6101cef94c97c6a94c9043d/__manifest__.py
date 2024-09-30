@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Multi Invoice Reconciliation | Invoice Partial Payment Reconcile Reconciliation",
+    'name': 'Multi Invoice Reconciliation | Invoice Partial Payment Reconcile Reconciliation',
     'version': '1.0',
     'author': 'Preway IT Solutions',
-    'category': 'Point of Sale',
-    'depends': ['account'],
-    'summary': 'This module is allow you to reconcile payment partial/full with multiple invoice/bills on payment | Invoice Partial Payment Reconciliation | Partial Invoice Payment and Reconciliation | Invoice Reconciliation with Partial Payment | Invoice Bill Partial Payment Reconciliation | Batch Payment Reconcile',
+    'category': 'Accounting',
+    'summary': 'Allows you to reconcile partial/full payments with multiple invoices/bills | Invoice Payment Reconciliation',
     'description': """
-This module is allow you to partial/full reconcile multiple invoice/bills on payment
+This module allows you to partially or fully reconcile multiple invoices/bills during payment.
     """,
-    "data" : [
-        'security/ir.model.access.csv',
-        'views/account_payment_view.xml',
+    'depends': ['account'],
+    'data': [
+        'security/ir.model.access.csv', 
+        'views/account_payment_view.xml',  
     ],
     'price': 60.0,
-    'currency': "EUR",
+    'currency': 'EUR',
     'application': True,
     'installable': True,
-    'live_test_url': 'https://youtu.be/M9UioY72xko',
-    "license": "LGPL-3",
-    "images":["static/description/Banner.png"],
+    'auto_install': False,  
+    'live_test_url': 'https://youtu.be/M9UioY72xko',  
+    'license': 'LGPL-3',  # Odoo 17 requiere especificar la licencia
+    'images': ['static/description/Banner.png'], 
 }
