@@ -8,30 +8,42 @@ class AccountPayment(models.Model):
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
 
-        
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
         if not self.partner_id:
             return
+
         partner_id = self.partner_id
-        self.reconcile_invoice_ids = [(5,)]
+        self.reconcile_invoice_ids = [(5,)]  # Elimina todas las reconciliaciones anteriores
+
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         moves = self.env['account.move'].sudo().search(
-            [('partner_id', '=', self.partner_id.id), ('state', '=', 'posted'),
+            [('partner_id', '=', self.partner_id.id),
+             ('state', '=', 'posted'),
              ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
              ('move_type', '=', move_type[self.payment_type])])
+
         vals = []
         for move in moves:
+            already_paid = 0.0
+            # Calculamos el total pagado a través de las reconciliaciones en las líneas contables
+            for line in move.line_ids:
+                # Sumar los pagos reconciliados en débitos y créditos
+                already_paid += sum(line.matched_debit_ids.mapped('amount')) + sum(line.matched_credit_ids.mapped('amount'))
+
+            # Agregar los valores de reconciliación de facturas a la lista
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': move.amount_total - move.amount_residual,
+                'already_paid': already_paid,  # Monto ya pagado
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
             }))
+
+        # Asignar los valores calculados a la línea de reconciliación
         self.reconcile_invoice_ids = vals
         self.partner_id = partner_id.id
         return
@@ -46,15 +58,30 @@ class AccountPayment(models.Model):
                 payment_amount += line.amount_paid
         self.amount = payment_amount
 
-    def action_post(self):
-        res = super(AccountPayment, self).action_post()
+    def action_post(self, *args, **kwargs):
+        # Llamar a la implementación original de action_post
+        res = super(AccountPayment, self).action_post(*args, **kwargs)
+
+        # Obtener las líneas de movimientos contables
         move_lines = self.env['account.move.line']
+        
+        # Filtrar las líneas de reconciliación con monto pagado
         rec_lines = self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0)
+        
         if rec_lines:
             for line in rec_lines:
-                invoice_move = line.invoice_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
-                payment_move = line.payment_id.move_id.line_ids.filtered(lambda r: not r.reconciled and r.account_id.x_internal_type in ('payable', 'receivable'))
-                move_lines |= (invoice_move + payment_move) 
+                # Filtrar las líneas de la factura y del pago para cuentas por cobrar/pagar (usando 'account_type')
+                invoice_move = line.invoice_id.line_ids.filtered(
+                    lambda r: not r.reconciled and r.account_id.account_type in ('asset_receivable', 'liability_payable')
+                )
+                payment_move = line.payment_id.move_id.line_ids.filtered(
+                    lambda r: not r.reconciled and r.account_id.account_type in ('asset_receivable', 'liability_payable')
+                )
+
+                # Añadir las líneas de movimiento a la colección
+                move_lines |= (invoice_move + payment_move)
+
+                # Crear reconciliación parcial dependiendo del tipo de partner
                 if invoice_move and payment_move and len(rec_lines) > 0:
                     if self.partner_type == 'customer':
                         rec = self.env['account.partial.reconcile'].create({
@@ -72,16 +99,19 @@ class AccountPayment(models.Model):
                             'debit_move_id': payment_move.id,
                             'credit_move_id': invoice_move.id,
                         })
+            
+            # Reconciliar las líneas de movimientos no reconciliadas
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
-        return res
 
+        return res
+        
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
 
     def _check_full_deduction(self):
         if self.invoice_id:
             payment_ids = [payment['account_payment_id'] for payment in
-                           self.invoice_id._get_reconciled_info_JSON_values()]
+                           self.invoice_id._get_reconciled_info_JSON()]
             if payment_ids:
                 payments = self.env['account.payment'].browse(payment_ids)
                 return any([True if payment.tds_amt or payment.sales_tds_amt else False for payment in payments])
