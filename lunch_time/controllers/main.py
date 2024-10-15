@@ -27,12 +27,16 @@ class LunchTime(http.Controller):
 
         # Ajustar la hora restando 6 horas
         adjusted_time = current_time - timedelta(hours=6)
-        extended_end_of_today = datetime.combine(date.today(), datetime.max.time()) + timedelta(hours=4)
+        adjusted_today_start = datetime.combine(date.today(), datetime.min.time()) - timedelta(hours=6)
+
+        # El final del "día" será 6 horas después de la medianoche de hoy (es decir, a las 6:00 AM del día siguiente)
+        adjusted_today_end = datetime.combine(date.today(), datetime.max.time()) + timedelta(hours=6)
 
         # Buscar registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', date.today())
+            ('check_in', '>=', adjusted_today_start),  # Desde 6 horas antes de la medianoche
+            ('check_in', '<=', adjusted_today_end)  # Hasta 6 horas después de la medianoche
         ], limit=1)
 
         if attendance:
