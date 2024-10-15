@@ -32,7 +32,7 @@ class LunchTime(http.Controller):
         # Buscar registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', extended_end_of_today)
+            ('check_in', '>=', date.today())
         ], limit=1)
 
         if attendance:
