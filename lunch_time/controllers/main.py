@@ -22,13 +22,14 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
+        # Obtener la hora actual
         current_time = datetime.now()
 
-
-        # Buscar registros de asistencia para el empleado, desde 6 horas antes hasta 6 horas después
+        # Buscar registros de asistencia de hoy para el empleado
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', datetime.now()),  # Desde 6 horas antes de la medianoche
+            ('check_in', '>=', date.today()),  # Desde 6 horas antes de la medianoche
+ 
         ], limit=1)
 
         if attendance:
@@ -48,6 +49,4 @@ class LunchTime(http.Controller):
             'current_time': current_time.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
-
-
 
