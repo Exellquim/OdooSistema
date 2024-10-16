@@ -27,6 +27,7 @@ class LunchTime(http.Controller):
 
         # Ajustar la hora restando 6 horas
         adjusted_time = current_time - timedelta(hours=6)
+        # Definir el inicio del día actual desde medianoche (00:00:00)
         today_start = datetime.combine(date.today(), datetime.min.time())
 
         # Definir el final del día actual extendido 6 horas (hasta las 06:00 AM del día siguiente)
