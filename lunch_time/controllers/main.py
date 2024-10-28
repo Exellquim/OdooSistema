@@ -1,7 +1,7 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime, date, timedelta
-import pytz
+import pytz  # Importar pytz para el manejo de zonas horarias
 
 class LunchTime(http.Controller):
 
@@ -24,25 +24,25 @@ class LunchTime(http.Controller):
             })
 
         # Obtener la hora actual en UTC
-        current_time_utc = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        current_time_utc = datetime.now(pytz.utc)
 
         # Convertir a la zona horaria del usuario
-        tz = request.env.user.tz
+        tz = request.env.user.tz  # Obtener la zona horaria del usuario
         if tz:
-            user_tz = timezone(tz)
+            user_tz = pytz.timezone(tz)  # Corregir aquí
             current_time = current_time_utc.astimezone(user_tz)
         else:
-            current_time = current_time_utc  # Sin conversión si no hay TZ
+            current_time = current_time_utc  # Si no hay zona horaria, usar UTC
 
-        # Definir el inicio y fin del día extendido en UTC
-        start_of_extended_day_utc = current_time_utc.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(hours=6)
-        end_of_extended_day_utc = current_time_utc.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1, hours=6)
+        # Definir el inicio y fin del día actual
+        start_of_extended_day = current_time.replace(hour=0, minute=0, second=0) - timedelta(hours=6)
+        end_of_extended_day = current_time.replace(hour=0, minute=0, second=0) + timedelta(days=1, hours=6)
 
-        # Buscar registros de asistencia para el empleado
+        # Buscar registros de asistencia
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', start_of_extended_day_utc),
-            ('check_in', '<=', end_of_extended_day_utc)
+            ('check_in', '>=', start_of_extended_day),
+            ('check_in', '<=', end_of_extended_day)
         ], limit=1)
 
         if attendance:
