@@ -9,7 +9,7 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-   @api.onchange('search_text')
+    @api.onchange('search_text')
     def _onchange_search_text(self):
         if self.search_text:
             # Filtra `reconcile_invoice_ids` para mostrar solo las facturas que coinciden con `search_text`
