@@ -8,6 +8,9 @@
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Invoice/Bills">
+                         <group>
+                            <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
+                        </group>
                         <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
                                 <field name="currency_id" invisible="1"/>
