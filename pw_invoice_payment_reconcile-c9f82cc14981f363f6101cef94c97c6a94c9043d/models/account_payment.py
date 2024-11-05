@@ -12,25 +12,18 @@ class AccountPayment(models.Model):
 
     @api.onchange('search_text')
     def _onchange_search_text(self):
-        # Si `reconcile_invoice_ids_all` está vacío, almacena los valores originales
         if not self.reconcile_invoice_ids_all:
+            # Si `reconcile_invoice_ids_all` está vacío, almacena los valores originales
             self.reconcile_invoice_ids_all = self.reconcile_invoice_ids
 
         if self.search_text:
-            # Filtra `reconcile_invoice_ids` para mostrar solo las facturas que coinciden con `search_text`
+            # Filtra las líneas de `reconcile_invoice_ids` para mostrar solo las que coinciden con `search_text`
             self.reconcile_invoice_ids = self.reconcile_invoice_ids_all.filtered(
                 lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
             )
         else:
-            # Restaura todos los registros originales
+            # Si `search_text` está vacío, muestra todas las líneas
             self.reconcile_invoice_ids = self.reconcile_invoice_ids_all
-
-
-    @api.model
-    def get_reconciled_invoices(self):
-        """Devuelve las facturas reconciliadas que coinciden con el campo relacionado."""
-        self.ensure_one()
-        return self.search([('invoice_id.name', '=', self.x_studio_related_field_824_1ibulqphi)])
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
