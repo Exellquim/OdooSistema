@@ -22,7 +22,7 @@ class AccountPayment(models.Model):
                 lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
             )
         else:
-            # Restaura todos los registros originales con cambios incluidos
+            # Restaura todos los registros originales
             self.reconcile_invoice_ids = self.reconcile_invoice_ids_all
 
 
