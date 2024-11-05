@@ -8,40 +8,28 @@
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Invoice/Bills">
-                         <group>
+                        <group>
                             <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
                         </group>
-                          <field name="reconcile_invoice_ids">
+                        <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
                                 <field name="currency_id" invisible="1"/>
-                                <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
-                                <field name="amount_untaxed" readonly="1" force_save="1"/>
-                                <field name="amount_tax" readonly="1" force_save="1"/>
-                                <field name="amount_total" readonly="1" force_save="1"/>
-                                <field name="already_paid" readonly="1" force_save="1"/>
-                                <field name="amount_residual" readonly="1" force_save="1"/>
-                                <field name="amount_paid"/>
+                                <field name="invoice_id" string="Number" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="amount_untaxed" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="amount_tax" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="amount_total" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="already_paid" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="amount_residual" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
+                                <field name="amount_paid"
+                                       attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
                             </tree>
                         </field>
-                     <!--<field name="reconcile_invoice_ids">
-                        <tree editable="bottom" create="false">
-                            <field name="currency_id" invisible="1"/>
-                            <field name="invoice_id" string="Number" readonly="1" force_save="1" 
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="amount_untaxed" readonly="1" force_save="1"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="amount_tax" readonly="1" force_save="1"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="amount_total" readonly="1" force_save="1"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="already_paid" readonly="1" force_save="1"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="amount_residual" readonly="1" force_save="1"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                            <field name="amount_paid"
-                                attrs="{'invisible': [('search_text', '!=', False), ('invoice_id.name', 'not ilike', search_text)]}"/>
-                        </tree>
-                    </field>-->
                     </page>
                 </notebook>
             </xpath>
