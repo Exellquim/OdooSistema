@@ -7,6 +7,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
+    search_text = fields.Char(string="Buscar Número de Factura")
     # Almacenar la lista original para restaurar después
     _original_reconcile_invoice_ids = None
 
