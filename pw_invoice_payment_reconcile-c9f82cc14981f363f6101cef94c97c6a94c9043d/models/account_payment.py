@@ -9,13 +9,19 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="All Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
-
+    
     @api.onchange('search_text')
     def _onchange_search_text(self):
-        # No se requiere modificar `reconcile_invoice_ids` en el modelo
-        # El filtro se aplicará en la vista usando el `domain` en el XML
-        pass
-
+        # Filtrar las facturas reconciliadas según el texto de búsqueda
+        domain = []
+        if self.search_text:
+            domain = ['|', ('invoice_id.name', 'ilike', self.search_text), ('invoice_id.name', '=', '')]
+        
+        return {
+            'domain': {
+                'reconcile_invoice_ids': domain
+            }
+        }
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
