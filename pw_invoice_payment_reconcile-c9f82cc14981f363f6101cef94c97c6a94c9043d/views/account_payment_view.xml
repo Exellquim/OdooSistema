@@ -11,7 +11,7 @@
                          <group>
                             <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
                         </group>
-                          <field name="reconcile_invoice_ids" domain="[('invoice_id.name', 'ilike', search_text.name)]">
+                          <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
                                 <field name="currency_id" invisible="1"/>
                                 <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
