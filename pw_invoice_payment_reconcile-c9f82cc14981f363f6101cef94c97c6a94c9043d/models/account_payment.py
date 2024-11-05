@@ -26,7 +26,7 @@ class AccountPayment(models.Model):
             self.reconcile_invoice_ids = self.reconcile_invoice_ids_all
 
 
-  @api.model
+    @api.model
     def get_reconciled_invoices(self):
         """Devuelve las facturas reconciliadas que coinciden con el campo relacionado."""
         self.ensure_one()
