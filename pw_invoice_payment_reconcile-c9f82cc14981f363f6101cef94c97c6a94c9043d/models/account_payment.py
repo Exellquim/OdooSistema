@@ -9,19 +9,28 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="All Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
-    
+
     @api.onchange('search_text')
     def _onchange_search_text(self):
-        # Filtrar las facturas reconciliadas según el texto de búsqueda
-        domain = []
+        # Si `reconcile_invoice_ids_all` está vacío, almacena los valores originales
+        if not self.reconcile_invoice_ids_all:
+            self.reconcile_invoice_ids_all = self.reconcile_invoice_ids
+
         if self.search_text:
-            domain = ['|', ('invoice_id.name', 'ilike', self.search_text), ('invoice_id.name', '=', '')]
-        
-        return {
-            'domain': {
-                'reconcile_invoice_ids': domain
-            }
-        }
+            # Filtra `reconcile_invoice_ids` para mostrar solo las facturas que coinciden con `search_text`
+            self.reconcile_invoice_ids = self.reconcile_invoice_ids_all.filtered(
+                lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
+            )
+        else:
+            # Restaura todos los registros originales con cambios incluidos
+            self.reconcile_invoice_ids = self.reconcile_invoice_ids_all
+
+
+  @api.model
+    def get_reconciled_invoices(self):
+        """Devuelve las facturas reconciliadas que coinciden con el campo relacionado."""
+        self.ensure_one()
+        return self.search([('invoice_id.name', '=', self.x_studio_related_field_824_1ibulqphi)])
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
