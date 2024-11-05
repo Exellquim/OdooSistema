@@ -8,33 +8,24 @@ class AccountPayment(models.Model):
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
-    # Almacenar la lista original para restaurar después
-    _original_reconcile_invoice_ids = None
+    reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="All Invoices", copy=False)
 
     @api.onchange('search_text')
     def _onchange_search_text(self):
-        # Almacena los registros originales la primera vez que se realiza la búsqueda
-        if self._original_reconcile_invoice_ids is None:
-            self._original_reconcile_invoice_ids = self.reconcile_invoice_ids
+        # Si `reconcile_invoice_ids_all` está vacío, almacena los valores originales
+        if not self.reconcile_invoice_ids_all:
+            self.reconcile_invoice_ids_all = self.reconcile_invoice_ids
 
         if self.search_text:
             # Filtra `reconcile_invoice_ids` para mostrar solo las facturas que coinciden con `search_text`
-            self.reconcile_invoice_ids = self._original_reconcile_invoice_ids.filtered(
+            self.reconcile_invoice_ids = self.reconcile_invoice_ids_all.filtered(
                 lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
             )
         else:
-            # Si `search_text` está vacío, restaura todos los registros originales con cambios incluidos
-            self.reconcile_invoice_ids = self._original_reconcile_invoice_ids
+            # Restaura todos los registros originales con cambios incluidos
+            self.reconcile_invoice_ids = self.reconcile_invoice_ids_all
 
-    @api.onchange('reconcile_invoice_ids')
-    def _onchange_reconcile_invoice_ids(self):
-        # Sincronizar `self._original_reconcile_invoice_ids` con cualquier cambio en `reconcile_invoice_ids`
-        if self._original_reconcile_invoice_ids:
-            for record in self.reconcile_invoice_ids:
-                original_record = self._original_reconcile_invoice_ids.filtered(lambda r: r.id == record.id)
-                if original_record:
-                    original_record.amount_paid = record.amount_paid  # Actualizar `amount_paid` en los originales
-
+    
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
         if not self.partner_id:
