@@ -14,6 +14,10 @@ class AccountPayment(models.Model):
         if not self.partner_id:
             return
 
+        # Guardar los valores previos de amount_paid
+        previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
+
+        # Limpiar los registros actuales antes de agregar nuevos
         self.reconcile_invoice_ids = [(5,)]
 
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
@@ -33,18 +37,23 @@ class AccountPayment(models.Model):
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
             
+            # Restaurar el valor previo de amount_paid si existe
+            amount_paid = previous_values.get(move.id, 0.0)
+            
             vals.append((0, 0, {
                 'payment_id': self.id,
-                'invoice_id': move.id,  # Asegúrate de que invoice_id esté siempre configurado
+                'invoice_id': move.id,
                 'already_paid': already_paid,
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
+                'amount_paid': amount_paid,  # Restaurar el valor
             }))
 
         self.reconcile_invoice_ids = vals
+        
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
         payment_amount = 0.0
