@@ -21,7 +21,8 @@
                         <field name="amount_residual" readonly="1" />
                         <field name="amount_paid" />
                     </tree>
-            </field>
-        </xpath> 
+                </field> <!-- Aquí se cerró la etiqueta <field> correctamente -->
+            </xpath> 
+        </field>
     </record>
 </odoo>
