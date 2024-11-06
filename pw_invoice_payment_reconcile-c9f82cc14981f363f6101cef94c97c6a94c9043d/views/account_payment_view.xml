@@ -15,7 +15,7 @@
                         <!-- Agregar el filtro a reconcile_invoice_ids -->
                         <field name="reconcile_invoice_ids" domain="[('is_visible', '=', True)]">
                             <tree editable="bottom" create="false">
-                                <!--<field name="currency_id" invisible="1"/>-->
+                                <field name="currency_id" invisible="1"/>
                                 <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
                                 <field name="amount_untaxed" readonly="1" force_save="1"/>
                                 <field name="amount_tax" readonly="1" force_save="1"/>
