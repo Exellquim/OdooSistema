@@ -966,11 +966,9 @@ class AccountPaymentReconcile(models.Model):
 
 
 class AccountPaymentReconcile(models.Model):
-    _name = 'account.payment.reconcile'
-    _description = 'Account Payment Reconcile'
+    _inherit = 'account.payment.reconcile'
 
-    payment_id = fields.Many2one('account.payment', string="Payment")
-    invoice_id = fields.Many2one('account.move', string="Invoice")
+    _description = 'Account Payment Reconcile'
     
     # Agregar campo is_visible para controlar la visibilidad de la factura
     is_visible = fields.Boolean("Visible", default=True)
