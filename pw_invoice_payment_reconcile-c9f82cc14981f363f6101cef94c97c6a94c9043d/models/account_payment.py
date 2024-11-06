@@ -12,11 +12,10 @@ class AccountPayment(models.Model):
     @api.onchange('search_text')
     def _onchange_search_text(self):
         if self.search_text:
-            # Actualiza el dominio de reconciliación de facturas basado en search_text
-            return {
-                'domain': {'reconcile_invoice_ids': [('invoice_id.name', 'ilike', self.search_text)]}
-            }
-        return {'domain': {'reconcile_invoice_ids': []}}  # Resetea el dominio si no hay texto
+            # Devuelve un dominio para aplicar el filtro en la vista
+            self.reconcile_invoice_ids = self.reconcile_invoice_ids.filtered(
+                lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
+            )
 
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
