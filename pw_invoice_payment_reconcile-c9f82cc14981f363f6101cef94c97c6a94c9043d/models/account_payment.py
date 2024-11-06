@@ -31,17 +31,15 @@ class AccountPayment(models.Model):
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
             reconcile_line = self.reconcile_invoice_ids.filtered(lambda r: r.invoice_id == move)
-            
+
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
                 'already_paid': already_paid,
                 'amount_residual': move.amount_residual,
-                'amount_untaxed': move.amount_untaxed,
-                'amount_tax': move.amount_tax,
-                'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
-                'amount_paid': reconcile_line.amount_paid if reconcile_line else 0.0,  
+                'currency_id': move.currency_id.id,
+                'amount_paid': reconcile_line.amount_paid if reconcile_line else 0.0,
             }))
 
         self.reconcile_invoice_ids = vals
