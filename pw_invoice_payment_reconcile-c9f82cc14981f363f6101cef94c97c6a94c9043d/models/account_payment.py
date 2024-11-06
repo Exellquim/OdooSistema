@@ -14,12 +14,6 @@ class AccountPayment(models.Model):
         if not self.partner_id:
             return
 
-        # Guardar los valores previos de amount_paid
-        previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
-
-        # Limpiar los registros actuales antes de agregar nuevos
-        self.reconcile_invoice_ids = [(5,)]
-
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
             ('partner_id', '=', self.partner_id.id),
@@ -36,9 +30,7 @@ class AccountPayment(models.Model):
         vals = []
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
-            
-            # Restaurar el valor previo de amount_paid si existe
-            amount_paid = previous_values.get(move.id, 0.0)
+            reconcile_line = self.reconcile_invoice_ids.filtered(lambda r: r.invoice_id == move)
             
             vals.append((0, 0, {
                 'payment_id': self.id,
@@ -49,10 +41,19 @@ class AccountPayment(models.Model):
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
-                'amount_paid': amount_paid,  # Restaurar el valor
+                'amount_paid': reconcile_line.amount_paid if reconcile_line else 0.0,  
             }))
 
         self.reconcile_invoice_ids = vals
+
+class AccountPaymentReconcile(models.Model):
+    _inherit = 'account.payment.reconcile'
+
+    @api.onchange('amount_paid')
+    def _onchange_amount_paid(self):
+        """ Guarda el valor de amount_paid en la base de datos inmediatamente al cambiarlo """
+        if self.amount_paid:
+            self.write({'amount_paid': self.amount_paid})
         
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
