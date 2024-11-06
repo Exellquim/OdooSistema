@@ -46,14 +46,6 @@ class AccountPayment(models.Model):
 
         self.reconcile_invoice_ids = vals
 
-class AccountPaymentReconcile(models.Model):
-    _inherit = 'account.payment.reconcile'
-
-    @api.onchange('amount_paid')
-    def _onchange_amount_paid(self):
-        """ Guarda el valor de amount_paid en la base de datos inmediatamente al cambiarlo """
-        if self.amount_paid:
-            self.write({'amount_paid': self.amount_paid})
         
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
