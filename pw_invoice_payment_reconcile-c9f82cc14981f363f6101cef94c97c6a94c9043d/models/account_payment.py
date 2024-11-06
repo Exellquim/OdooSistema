@@ -9,13 +9,6 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-    def _compute_is_visible(self):
-        for record in self:
-            for invoice in record.reconcile_invoice_ids:
-                # Verifica si el texto de búsqueda está presente en el nombre de la factura
-                invoice.is_visible = record.search_text and (record.search_text.lower() in invoice.invoice_id.name.lower())
-    
-
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
@@ -963,12 +956,3 @@ class AccountPaymentReconcile(models.Model):
                         payment.move_id.action_post()
 
         return res
-
-
-class AccountPaymentReconcile(models.Model):
-    _inherit = 'account.payment.reconcile'
-
-    _description = 'Account Payment Reconcile'
-    
-    # Agregar campo is_visible para controlar la visibilidad de la factura
-    is_visible = fields.Boolean("Visible", default=True)
