@@ -5,15 +5,18 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <!-- Campo para el texto de búsqueda -->
+                <!-- Campo de búsqueda -->
                 <group>
-                    <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
+                    <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
                 </group>
-                
-                <!-- Lista de reconciliación de facturas con filtro basado en 'search_text' -->
+
+                <!-- Línea de reconciliación de facturas con filtro dinámico -->
                 <field name="reconcile_invoice_ids">
                     <tree editable="bottom" create="false">
-                        <attribute name="domain">[('invoice_id.name', 'ilike', parent.search_text)]</attribute>
+                        <!-- Filtro basado en search_text para la búsqueda de las facturas -->
+                        <filter string="Filter by Invoice" name="invoice_filter"
+                                domain="[('invoice_id.name', 'ilike', search_text)]" />
+                        
                         <field name="currency_id" invisible="1"/>
                         <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
                         <field name="amount_untaxed" readonly="1" force_save="1"/>
@@ -28,3 +31,4 @@
         </field>
     </record>
 </odoo>
+
