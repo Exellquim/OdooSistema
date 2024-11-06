@@ -39,7 +39,7 @@ class AccountPayment(models.Model):
 
             # Recuperar el valor previo de amount_paid si existe
             amount_paid = previous_values.get(move.id, 0.0)
-            
+
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
@@ -52,8 +52,9 @@ class AccountPayment(models.Model):
                 'amount_paid': amount_paid,  # Restaurar el valor previo
             }))
 
-        # Añadir los nuevos registros a los existentes sin borrar lo anterior
+        # Mantener los registros existentes y añadir los nuevos
         self.reconcile_invoice_ids = [(4, line.id) for line in self.reconcile_invoice_ids] + vals
+        
         
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
