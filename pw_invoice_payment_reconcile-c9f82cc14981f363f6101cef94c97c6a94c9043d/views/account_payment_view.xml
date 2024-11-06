@@ -7,8 +7,7 @@
             <xpath expr="//sheet" position="inside">
                 <!-- Campo de búsqueda -->
                 <group>
-                    <field name="search_text" placeholder="Ingrese número de factura para buscar..." 
-                           context="{'search_text': search_text}"/>
+                    <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
                 </group>
 
                 <!-- Línea de reconciliación de facturas -->
@@ -24,11 +23,6 @@
                         <field name="amount_paid"/>
                     </tree>
                 </field>
-            </xpath>
-
-            <!-- Aplicar el dominio con el valor del campo search_text -->
-            <xpath expr="//field[@name='reconcile_invoice_ids']" position="attributes">
-                <attribute name="domain">[('invoice_id.name', 'ilike', context.get('search_text', ''))]</attribute>
             </xpath>
         </field>
     </record>
