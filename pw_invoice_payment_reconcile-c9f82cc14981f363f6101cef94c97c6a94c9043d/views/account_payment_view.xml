@@ -5,9 +5,10 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <!-- Campo de búsqueda para filtrar las facturas -->
+                <!-- Campo de búsqueda -->
                 <group>
-                    <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
+                    <field name="search_text" placeholder="Ingrese número de factura para buscar..." 
+                           context="{'search_text': search_text}"/>
                 </group>
 
                 <!-- Línea de reconciliación de facturas -->
@@ -25,7 +26,7 @@
                 </field>
             </xpath>
 
-            <!-- Filtro aplicado directamente sobre el dominio de la factura -->
+            <!-- Aplicar el dominio con el valor del campo search_text -->
             <xpath expr="//field[@name='reconcile_invoice_ids']" position="attributes">
                 <attribute name="domain">[('invoice_id.name', 'ilike', context.get('search_text', ''))]</attribute>
             </xpath>
