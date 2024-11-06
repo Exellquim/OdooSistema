@@ -17,8 +17,9 @@ class AccountPayment(models.Model):
         # Guardar los valores previos de amount_paid
         previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
 
-        # Limpiar los registros actuales antes de agregar nuevos
-        self.reconcile_invoice_ids = [(5,)]
+        # Limpiar los registros actuales antes de agregar nuevos solo si hay un cambio en los filtros
+        if self.search_text or self.partner_id:
+            self.reconcile_invoice_ids = [(5,)]  # Limpiar solo si hay cambios en los filtros
 
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
@@ -36,10 +37,11 @@ class AccountPayment(models.Model):
         vals = []
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
-            
-            # Restaurar el valor previo de amount_paid si existe
+
+            # Recuperar el valor previo de amount_paid si existe
             amount_paid = previous_values.get(move.id, 0.0)
-            
+
+            # Asegurarse de que se asignen correctamente los valores
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
@@ -49,11 +51,15 @@ class AccountPayment(models.Model):
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
-                'amount_paid': amount_paid,  # Restaurar el valor
+                'amount_paid': amount_paid,  # Restaurar el valor previo
             }))
 
-        self.reconcile_invoice_ids = vals
-
+        # Verifica que no se hayan generado valores vacíos o nulos
+        if vals:
+            self.reconcile_invoice_ids = vals
+        else:
+            # Si no hay facturas, asegúrate de no dejar la relación vacía
+            self.reconcile_invoice_ids = [(5,)]
         
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
