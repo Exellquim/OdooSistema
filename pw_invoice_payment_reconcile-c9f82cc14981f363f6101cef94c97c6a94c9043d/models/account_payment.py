@@ -9,14 +9,6 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-from odoo import api, fields, models, _
-
-class AccountPayment(models.Model):
-    _inherit = 'account.payment'
-
-    reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
-    search_text = fields.Char(string="Buscar Número de Factura")
-
     @api.onchange('partner_id', 'payment_type', 'partner_type', 'search_text')
     def _onchange_partner_id(self):
         if not self.partner_id:
