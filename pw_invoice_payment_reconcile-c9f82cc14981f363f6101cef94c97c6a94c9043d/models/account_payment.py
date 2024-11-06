@@ -17,9 +17,6 @@ class AccountPayment(models.Model):
         # Guardar los valores previos de amount_paid
         previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
 
-        # Limpiar los registros actuales antes de agregar nuevos
-        self.reconcile_invoice_ids = [(5,)]
-
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
             ('partner_id', '=', self.partner_id.id),
@@ -39,7 +36,7 @@ class AccountPayment(models.Model):
         vals = []
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
-            
+
             # Recuperar el valor previo de amount_paid si existe
             amount_paid = previous_values.get(move.id, 0.0)
             
@@ -55,10 +52,9 @@ class AccountPayment(models.Model):
                 'amount_paid': amount_paid,  # Restaurar el valor previo
             }))
 
-        # Actualizar los registros de reconciliación
-        self.reconcile_invoice_ids = vals
+        # Añadir los nuevos registros a los existentes sin borrar lo anterior
+        self.reconcile_invoice_ids = [(4, line.id) for line in self.reconcile_invoice_ids] + vals
         
-
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
         payment_amount = 0.0
