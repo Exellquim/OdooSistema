@@ -9,7 +9,7 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-    @api.onchange('partner_id', 'payment_type', 'partner_type', 'search_text')
+     @api.onchange('partner_id', 'payment_type', 'partner_type', 'search_text')
     def _onchange_partner_id(self):
         if not self.partner_id:
             return
@@ -22,29 +22,36 @@ class AccountPayment(models.Model):
             ('move_type', '=', move_type[self.payment_type])
         ]
 
+        # Aplicar filtro adicional si se ha introducido un texto de búsqueda
         if self.search_text:
             domain.append(('name', 'ilike', self.search_text))
 
+        # Buscar las facturas que coincidan con los criterios
         moves = self.env['account.move'].sudo().search(domain)
 
+        # Crear las reconciliaciones de pago
         vals = []
         for move in moves:
+            # Sumar los pagos realizados ya
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
             reconcile_line = self.reconcile_invoice_ids.filtered(lambda r: r.invoice_id == move)
-
+            
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
                 'already_paid': already_paid,
                 'amount_residual': move.amount_residual,
-                'amount_total': move.amount_total,
+                'amount_untaxed': move.amount_untaxed,
+                'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
+                'amount_total': move.amount_total,
                 'amount_paid': reconcile_line.amount_paid if reconcile_line else 0.0,
             }))
 
+        # Actualizar las facturas reconciliadas asociadas
         self.reconcile_invoice_ids = vals
 
-        
+
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
         payment_amount = 0.0
@@ -951,3 +958,13 @@ class AccountPaymentReconcile(models.Model):
                         payment.move_id.action_post()
 
         return res
+        
+class AccountPaymentReconcile(models.Model):
+    _inherit = 'account.payment.reconcile'
+
+    @api.onchange('amount_paid')
+    def _onchange_amount_paid(self):
+        """ Guarda el valor de amount_paid en la base de datos inmediatamente al cambiarlo """
+        if self.amount_paid:
+            self.write({'amount_paid': self.amount_paid})
+        
