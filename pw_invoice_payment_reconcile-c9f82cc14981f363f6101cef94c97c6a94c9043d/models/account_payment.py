@@ -36,11 +36,9 @@ class AccountPayment(models.Model):
         # Prepara los valores para las facturas encontradas
         vals = []
         for move in moves:
-            already_paid = sum(
-                line.matched_debit_ids.mapped('amount') +
-                line.matched_credit_ids.mapped('amount')
-                for line in move.line_ids
-            )
+            # Calcula el monto total ya pagado a través de las reconciliaciones en las líneas contables
+            already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
+            
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
