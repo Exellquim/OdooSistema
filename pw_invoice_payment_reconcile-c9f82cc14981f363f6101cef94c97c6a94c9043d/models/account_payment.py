@@ -14,6 +14,12 @@ class AccountPayment(models.Model):
         if not self.partner_id:
             return
 
+        # Guardar los valores previos de amount_paid
+        previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
+
+        # Limpiar los registros actuales antes de agregar nuevos
+        self.reconcile_invoice_ids = [(5,)]
+
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
             ('partner_id', '=', self.partner_id.id),
@@ -22,19 +28,20 @@ class AccountPayment(models.Model):
             ('move_type', '=', move_type[self.payment_type])
         ]
 
-        # Aplicar filtro adicional si se ha introducido un texto de búsqueda
+        # Filtrado por número de factura si se ha proporcionado texto en el campo search_text
         if self.search_text:
             domain.append(('name', 'ilike', self.search_text))
 
-        # Buscar las facturas que coincidan con los criterios
+        # Obtener las facturas que coinciden con los filtros
         moves = self.env['account.move'].sudo().search(domain)
 
-        # Crear las reconciliaciones de pago
+        # Crear los registros de reconciliación
         vals = []
         for move in moves:
-            # Sumar los pagos realizados ya
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
-            reconcile_line = self.reconcile_invoice_ids.filtered(lambda r: r.invoice_id == move)
+            
+            # Recuperar el valor previo de amount_paid si existe
+            amount_paid = previous_values.get(move.id, 0.0)
             
             vals.append((0, 0, {
                 'payment_id': self.id,
@@ -45,12 +52,12 @@ class AccountPayment(models.Model):
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
-                'amount_paid': reconcile_line.amount_paid if reconcile_line else 0.0,
+                'amount_paid': amount_paid,  # Restaurar el valor previo
             }))
 
-        # Actualizar las facturas reconciliadas asociadas
+        # Actualizar los registros de reconciliación
         self.reconcile_invoice_ids = vals
-
+        
 
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
