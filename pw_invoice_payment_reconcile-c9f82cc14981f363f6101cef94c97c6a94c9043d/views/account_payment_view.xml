@@ -10,16 +10,18 @@
                     <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
                 </group>
 
-                <!-- Línea de reconciliación de facturas con filtro dinámico -->
-                <field name="reconcile_invoice_ids" domain="[('invoice_id.name', 'ilike', search_text)]">
+                <!-- Línea de reconciliación de facturas -->
+                <field name="reconcile_invoice_ids">
                     <tree editable="bottom" create="false">
+                        <!-- Dominio dinámico usando el contexto para el filtro -->
+                        <attribute name="context">{'search_text': search_text}</attribute>
                         <field name="currency_id" invisible="1"/>
-                        <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
-                        <field name="amount_untaxed" readonly="1" force_save="1"/>
-                        <field name="amount_tax" readonly="1" force_save="1"/>
-                        <field name="amount_total" readonly="1" force_save="1"/>
-                        <field name="already_paid" readonly="1" force_save="1"/>
-                        <field name="amount_residual" readonly="1" force_save="1"/>
+                        <field name="invoice_id" string="Número" readonly="1"/>
+                        <field name="amount_untaxed" readonly="1"/>
+                        <field name="amount_tax" readonly="1"/>
+                        <field name="amount_total" readonly="1"/>
+                        <field name="already_paid" readonly="1"/>
+                        <field name="amount_residual" readonly="1"/>
                         <field name="amount_paid"/>
                     </tree>
                 </field>
@@ -27,4 +29,3 @@
         </field>
     </record>
 </odoo>
-
