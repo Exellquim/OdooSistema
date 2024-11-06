@@ -22,6 +22,6 @@
                         <field name="amount_paid" />
                     </tree>
             </field>
-
+        </xpath> 
     </record>
 </odoo>
