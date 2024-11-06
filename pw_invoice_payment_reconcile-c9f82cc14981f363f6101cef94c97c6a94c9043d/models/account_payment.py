@@ -10,13 +10,13 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="All Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
     is_visible = fields.Boolean("Visible", compute="_compute_is_visible", store=True)
-    # Campo Computado para Filtrar la Visibilidad de los Registros
+
     def _compute_is_visible(self):
         for record in self:
             for invoice in record.reconcile_invoice_ids:
-                # Verificar si el número de la factura contiene el texto de búsqueda
-                invoice.is_visible = search_text and (search_text.lower() in invoice.invoice_id.name.lower())
-
+                # Acceder al valor de search_text a través del registro (record.search_text)
+                invoice.is_visible = record.search_text and (record.search_text.lower() in invoice.invoice_id.name.lower())
+    
 
     
     @api.onchange('partner_id', 'payment_type', 'partner_type')
