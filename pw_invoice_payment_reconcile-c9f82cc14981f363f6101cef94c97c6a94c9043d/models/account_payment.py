@@ -9,43 +9,42 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-    @api.onchange('search_text')
-    def _onchange_search_text(self):
-        if self.search_text:
-            # Devuelve un dominio para aplicar el filtro en la vista
-            self.reconcile_invoice_ids = self.reconcile_invoice_ids.filtered(
-                lambda r: self.search_text.lower() in (r.invoice_id.name or '').lower()
-            )
-
-    
-    @api.onchange('partner_id', 'payment_type', 'partner_type')
+    @api.onchange('partner_id', 'payment_type', 'partner_type', 'search_text')
     def _onchange_partner_id(self):
         if not self.partner_id:
             return
 
-        partner_id = self.partner_id
-        self.reconcile_invoice_ids = [(5,)]  # Elimina todas las reconciliaciones anteriores
+        # Elimina todas las reconciliaciones anteriores
+        self.reconcile_invoice_ids = [(5,)]
 
+        # Configura el tipo de movimiento según el tipo de pago
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
-        moves = self.env['account.move'].sudo().search(
-            [('partner_id', '=', self.partner_id.id),
-             ('state', '=', 'posted'),
-             ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
-             ('move_type', '=', move_type[self.payment_type])])
+        domain = [
+            ('partner_id', '=', self.partner_id.id),
+            ('state', '=', 'posted'),
+            ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
+            ('move_type', '=', move_type[self.payment_type])
+        ]
 
+        # Aplica el filtro del `search_text` si existe
+        if self.search_text:
+            domain.append(('name', 'ilike', self.search_text))
+
+        # Realiza la búsqueda de las facturas según el dominio construido
+        moves = self.env['account.move'].sudo().search(domain)
+
+        # Prepara los valores para las facturas encontradas
         vals = []
         for move in moves:
-            already_paid = 0.0
-            # Calculamos el total pagado a través de las reconciliaciones en las líneas contables
-            for line in move.line_ids:
-                # Sumar los pagos reconciliados en débitos y créditos
-                already_paid += sum(line.matched_debit_ids.mapped('amount')) + sum(line.matched_credit_ids.mapped('amount'))
-
-            # Agregar los valores de reconciliación de facturas a la lista
+            already_paid = sum(
+                line.matched_debit_ids.mapped('amount') +
+                line.matched_credit_ids.mapped('amount')
+                for line in move.line_ids
+            )
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
-                'already_paid': already_paid,  # Monto ya pagado
+                'already_paid': already_paid,
                 'amount_residual': move.amount_residual,
                 'amount_untaxed': move.amount_untaxed,
                 'amount_tax': move.amount_tax,
@@ -53,11 +52,10 @@ class AccountPayment(models.Model):
                 'amount_total': move.amount_total,
             }))
 
-        # Asignar los valores calculados a la línea de reconciliación
+        # Asigna los valores calculados a `reconcile_invoice_ids`
         self.reconcile_invoice_ids = vals
-        self.partner_id = partner_id.id
-        return
-
+    
+  
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
         payment_amount = 0.0
