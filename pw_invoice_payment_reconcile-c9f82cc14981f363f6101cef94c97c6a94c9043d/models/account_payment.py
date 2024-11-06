@@ -9,7 +9,7 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
-   def _compute_is_visible(self):
+    def _compute_is_visible(self):
         for record in self:
             for invoice in record.reconcile_invoice_ids:
                 # Verifica si el texto de búsqueda está presente en el nombre de la factura
