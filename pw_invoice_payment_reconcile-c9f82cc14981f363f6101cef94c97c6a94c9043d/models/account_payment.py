@@ -7,14 +7,12 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
-    reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="All Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
-    is_visible = fields.Boolean("Visible", compute="_compute_is_visible", store=True)
 
-    def _compute_is_visible(self):
+   def _compute_is_visible(self):
         for record in self:
             for invoice in record.reconcile_invoice_ids:
-                # Acceder al valor de search_text a través del registro (record.search_text)
+                # Verifica si el texto de búsqueda está presente en el nombre de la factura
                 invoice.is_visible = record.search_text and (record.search_text.lower() in invoice.invoice_id.name.lower())
     
 
@@ -965,3 +963,14 @@ class AccountPaymentReconcile(models.Model):
                         payment.move_id.action_post()
 
         return res
+
+
+class AccountPaymentReconcile(models.Model):
+    _name = 'account.payment.reconcile'
+    _description = 'Account Payment Reconcile'
+
+    payment_id = fields.Many2one('account.payment', string="Payment")
+    invoice_id = fields.Many2one('account.move', string="Invoice")
+    
+    # Agregar campo is_visible para controlar la visibilidad de la factura
+    is_visible = fields.Boolean("Visible", default=True)
