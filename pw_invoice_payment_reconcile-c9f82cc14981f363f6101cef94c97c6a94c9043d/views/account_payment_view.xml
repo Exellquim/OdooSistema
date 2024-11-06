@@ -10,17 +10,18 @@
                     <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
                 </group>
 
-                <field name="reconcile_invoice_ids" options="{'force_save': True}">
-                      <tree editable="bottom" create="false">
-                            <field name="currency_id" invisible="1"/>
-                            <field name="invoice_id" string="Número" readonly="1" />
-                            <field name="amount_untaxed" readonly="1" />
-                            <field name="amount_tax" readonly="1" />
-                            <field name="amount_total" readonly="1" />
-                            <field name="already_paid" readonly="1" />
-                            <field name="amount_residual" readonly="1" />
-                            <field name="amount_paid" />
+                <field name="reconcile_invoice_ids" options="{'reload_on_save': True}">
+                    <tree editable="bottom" create="false">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="invoice_id" string="Número" readonly="1" />
+                        <field name="amount_untaxed" readonly="1" />
+                        <field name="amount_tax" readonly="1" />
+                        <field name="amount_total" readonly="1" />
+                        <field name="already_paid" readonly="1" />
+                        <field name="amount_residual" readonly="1" />
+                        <field name="amount_paid" />
                     </tree>
             </field>
+
     </record>
 </odoo>
