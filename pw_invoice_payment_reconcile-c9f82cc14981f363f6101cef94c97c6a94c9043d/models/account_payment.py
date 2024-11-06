@@ -9,6 +9,14 @@ class AccountPayment(models.Model):
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
     search_text = fields.Char(string="Buscar Número de Factura")
 
+from odoo import api, fields, models, _
+
+class AccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
+    search_text = fields.Char(string="Buscar Número de Factura")
+
     @api.onchange('partner_id', 'payment_type', 'partner_type', 'search_text')
     def _onchange_partner_id(self):
         if not self.partner_id:
@@ -17,10 +25,8 @@ class AccountPayment(models.Model):
         # Guardar los valores previos de amount_paid
         previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
 
-        # Limpiar los registros actuales si es necesario
-        # Solo limpiamos si hay un cambio en los filtros, de lo contrario mantenemos los registros existentes
-        if self.search_text or self.partner_id:
-            self.reconcile_invoice_ids = [(5,)]  # Limpiar solo si hay cambios en los filtros
+        # Limpiar los registros actuales antes de agregar nuevos
+        self.reconcile_invoice_ids = [(5,)]
 
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
@@ -30,21 +36,18 @@ class AccountPayment(models.Model):
             ('move_type', '=', move_type[self.payment_type])
         ]
 
-        # Filtrado por número de factura si se ha proporcionado texto en el campo search_text
         if self.search_text:
             domain.append(('name', 'ilike', self.search_text))
 
-        # Obtener las facturas que coinciden con los filtros
         moves = self.env['account.move'].sudo().search(domain)
 
-        # Crear los registros de reconciliación
         vals = []
         for move in moves:
             already_paid = sum(matched.amount for line in move.line_ids for matched in (line.matched_debit_ids | line.matched_credit_ids))
-
-            # Recuperar el valor previo de amount_paid si existe
+            
+            # Restaurar el valor previo de amount_paid si existe
             amount_paid = previous_values.get(move.id, 0.0)
-
+            
             vals.append((0, 0, {
                 'payment_id': self.id,
                 'invoice_id': move.id,
@@ -54,13 +57,11 @@ class AccountPayment(models.Model):
                 'amount_tax': move.amount_tax,
                 'currency_id': move.currency_id.id,
                 'amount_total': move.amount_total,
-                'amount_paid': amount_paid,  # Restaurar el valor previo
+                'amount_paid': amount_paid,  # Restaurar el valor
             }))
 
-        # Actualizar los registros de reconciliación
         self.reconcile_invoice_ids = vals
-        
-        
+
         
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
