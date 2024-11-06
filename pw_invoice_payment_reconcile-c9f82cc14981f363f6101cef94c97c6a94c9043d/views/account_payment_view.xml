@@ -9,11 +9,11 @@
                 <group>
                     <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
                 </group>
-
+                
                 <!-- Lista de reconciliación de facturas con filtro basado en 'search_text' -->
                 <field name="reconcile_invoice_ids">
                     <tree editable="bottom" create="false">
-                        <attribute name="domain">[('invoice_id.name', 'ilike', search_text)]</attribute>
+                        <attribute name="domain">[('invoice_id.name', 'ilike', parent.search_text)]</attribute>
                         <field name="currency_id" invisible="1"/>
                         <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
                         <field name="amount_untaxed" readonly="1" force_save="1"/>
