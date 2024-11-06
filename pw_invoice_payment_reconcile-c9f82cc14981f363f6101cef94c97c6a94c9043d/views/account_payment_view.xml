@@ -11,10 +11,10 @@
                         <group>
                             <field name="search_text" placeholder="Ingrese número de factura para buscar..."/>
                         </group>
-
-                        <!-- Agregar el filtro a reconcile_invoice_ids -->
-                        <field name="reconcile_invoice_ids" domain="[('is_visible', '=', True)]">
+                        <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
+                                <!-- Aplica un dominio para filtrar basado en el texto de búsqueda -->
+                                <attribute name="domain">[('invoice_id.name', 'ilike', parent.search_text)]</attribute>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="invoice_id" string="Number" readonly="1" force_save="1"/>
                                 <field name="amount_untaxed" readonly="1" force_save="1"/>
@@ -23,9 +23,6 @@
                                 <field name="already_paid" readonly="1" force_save="1"/>
                                 <field name="amount_residual" readonly="1" force_save="1"/>
                                 <field name="amount_paid"/>
-                                
-                                <!-- Campo Computado para Controlar Visibilidad -->
-                                <field name="is_visible" invisible="1"/>
                             </tree>
                         </field>
                     </page>
