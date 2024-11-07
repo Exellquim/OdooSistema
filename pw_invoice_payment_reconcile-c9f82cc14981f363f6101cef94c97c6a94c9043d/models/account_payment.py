@@ -18,10 +18,10 @@ class AccountPayment(models.Model):
         previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
 
         if self.search_text or self.partner_id:
-        updated_lines = [(0, 0, {'invoice_id': line.invoice_id.id, 'amount_paid': previous_values[line.invoice_id.id]})
+            updated_lines = [(0, 0, {'invoice_id': line.invoice_id.id, 'amount_paid': previous_values[line.invoice_id.id]})
                                 for line in self.reconcile_invoice_ids]
-        self.reconcile_invoice_ids = [(5,)]
-        self.reconcile_invoice_ids = updated_lines
+            self.reconcile_invoice_ids = [(5,)]
+            self.reconcile_invoice_ids = updated_lines
 
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
