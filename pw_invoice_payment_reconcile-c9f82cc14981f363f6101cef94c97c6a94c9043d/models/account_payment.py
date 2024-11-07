@@ -17,9 +17,11 @@ class AccountPayment(models.Model):
         # Guardar los valores previos de amount_paid
         previous_values = {line.invoice_id.id: line.amount_paid for line in self.reconcile_invoice_ids}
 
-        # Limpiar los registros actuales antes de agregar nuevos solo si hay un cambio en los filtros
         if self.search_text or self.partner_id:
-            self.reconcile_invoice_ids = [(5,)]  # Limpiar solo si hay cambios en los filtros
+        updated_lines = [(0, 0, {'invoice_id': line.invoice_id.id, 'amount_paid': previous_values[line.invoice_id.id]})
+                                for line in self.reconcile_invoice_ids]
+        self.reconcile_invoice_ids = [(5,)]
+        self.reconcile_invoice_ids = updated_lines
 
         move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
         domain = [
