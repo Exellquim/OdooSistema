@@ -27,7 +27,7 @@
         </field>
     </record>
 
-    <record id="view_account_payment_invoice_wizard_form" model="ir.ui.view">
+<record id="view_account_payment_invoice_wizard_form" model="ir.ui.view">
     <field name="name">account.payment.invoice.wizard.form</field>
     <field name="model">account.payment.invoice.wizard</field>
     <field name="arch" type="xml">
@@ -36,7 +36,23 @@
                 <field name="payment_id" invisible="1"/>
                 <field name="partner_id" readonly="1"/>
                 <field name="payment_type" readonly="1"/>
-                <field name="invoice_ids" widget="many2many_tags"/>
+                <!-- Vista tree de selección para facturas -->
+                <field name="invoice_ids" mode="tree,form">
+                    <tree string="Select Invoices" editable="bottom">
+                        <field name="name"/>
+                        <field name="invoice_date" string="Invoice Date"/>
+                        <field name="amount_total" string="Total Amount"/>
+                        <field name="amount_residual" string="Amount Due"/>
+                    </tree>
+                    <form string="Invoice Details">
+                        <sheet>
+                            <field name="name"/>
+                            <field name="invoice_date" string="Invoice Date"/>
+                            <field name="amount_total" string="Total Amount"/>
+                            <field name="amount_residual" string="Amount Due"/>
+                        </sheet>
+                    </form>
+                </field>
             </group>
             <footer>
                 <button name="action_add_invoices" string="Add Selected Invoices" type="object" class="btn-primary"/>
@@ -45,6 +61,7 @@
         </form>
     </field>
 </record>
+
 <record id="action_account_payment_invoice_wizard" model="ir.actions.act_window">
     <field name="name">Select Invoices</field>
     <field name="res_model">account.payment.invoice.wizard</field>
