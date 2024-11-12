@@ -83,8 +83,7 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
 
     payment_id = fields.Many2one('account.payment', string="Payment")
     invoice_ids = fields.Many2many(
-        'account.move', string="Invoices",
-        domain="[('partner_id', '=', partner_id), ('state', '=', 'posted'), ('payment_state', 'not in', ['paid', 'reversed', 'in_payment'])]"
+        'account.move', string="Invoices"
     )
     partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
     payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
@@ -95,16 +94,8 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
         payment_id = self.env.context.get('active_id')
         if payment_id:
             payment = self.env['account.payment'].browse(payment_id)
-            move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
-            invoices = self.env['account.move'].sudo().search([
-                ('partner_id', '=', payment.partner_id.id),
-                ('state', '=', 'posted'),
-                ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
-                ('move_type', '=', move_type.get(payment.payment_type))
-            ])
             res.update({
                 'payment_id': payment_id,
-                'invoice_ids': [(6, 0, invoices.ids)],
             })
         return res
 
@@ -124,6 +115,7 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
             }))
         self.payment_id.reconcile_invoice_ids = reconcile_lines
         return {'type': 'ir.actions.act_window_close'}
+
 
 
 class AccountPaymentReconcile(models.Model):
