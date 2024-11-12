@@ -36,24 +36,24 @@
                 <field name="payment_id" invisible="1"/>
                 <field name="partner_id" readonly="1"/>
                 <field name="payment_type" readonly="1"/>
-                <!-- Aquí mostramos la vista tree con un checkbox para seleccionar las facturas -->
+                <!-- Mostrar la vista tree con las facturas del cliente -->
                 <field name="invoice_ids" mode="tree">
-                    <tree string="Select Invoices">
-                        <field name="name"/>
+                    <tree string="Invoices">
+                        <field name="name" string="Invoice"/>
                         <field name="invoice_date" string="Invoice Date"/>
                         <field name="amount_total" string="Total Amount"/>
                         <field name="amount_residual" string="Amount Due"/>
-                        <field name="is_selected" string="Select" widget="boolean"/>
                     </tree>
                 </field>
             </group>
             <footer>
-                <button name="action_add_invoices" string="Guardar facturas seleccionadas" type="object" class="btn-primary"/>
+                <button name="action_add_invoices" string="Add Invoices" type="object" class="btn-primary"/>
                 <button string="Cancel" class="btn-secondary" special="cancel"/>
             </footer>
         </form>
     </field>
 </record>
+
 
 
 <record id="action_account_payment_invoice_wizard" model="ir.actions.act_window">
