@@ -83,7 +83,8 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
 
     payment_id = fields.Many2one('account.payment', string="Payment")
     invoice_ids = fields.Many2many(
-        'account.move', string="Invoices"
+        'account.move', string="Invoices",
+         domain="[('partner_id', '=', partner_id), ('state', '=', 'posted')]"
     )
     partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
     payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
