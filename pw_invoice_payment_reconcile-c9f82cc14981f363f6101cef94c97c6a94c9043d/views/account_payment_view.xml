@@ -31,7 +31,7 @@
     <field name="name">account.payment.invoice.wizard.form</field>
     <field name="model">account.payment.invoice.wizard</field>
     <field name="arch" type="xml">
-        <form string="Select Invoices for Payment Reconciliation">
+        <form string="Seleccione Facturas para conciliación de pagos">
             <group>
                 <field name="payment_id" invisible="1"/>
                 <field name="partner_id" readonly="1"/>
@@ -58,7 +58,7 @@
 
 
 <record id="action_account_payment_invoice_wizard" model="ir.actions.act_window">
-    <field name="name">Select Invoices</field>
+    <field name="name">Seleccione las facturas</field>
     <field name="res_model">account.payment.invoice.wizard</field>
     <field name="view_mode">form</field>
     <field name="view_id" ref="view_account_payment_invoice_wizard_form"/>
