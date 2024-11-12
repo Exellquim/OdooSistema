@@ -22,6 +22,16 @@ class AccountPayment(models.Model):
             },
         }
 
+    @api.onchange('reconcile_invoice_ids')
+    def _onchnage_reconcile_invoice_ids(self):
+        payment_amount = 0.0
+        for line in self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0):
+            if self.currency_id != line.currency_id:
+                payment_amount += line.currency_id._convert(line.amount_paid, self.currency_id, self.env.company, self.date)
+            else:
+                payment_amount += line.amount_paid
+        self.amount = payment_amount
+
 
     def action_post(self, *args, **kwargs):
         # Llamar a la implementación original de action_post
@@ -82,6 +92,9 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
     partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
     payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
 
+    # Este campo booleano se utiliza para la selección en la vista tree
+    is_selected = fields.Boolean(string="Select", default=False)
+
     @api.model
     def default_get(self, fields):
         res = super(AccountPaymentInvoiceWizard, self).default_get(fields)
@@ -104,29 +117,21 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
     def action_add_invoices(self):
         reconcile_lines = []
         for invoice in self.invoice_ids:
-            already_paid = sum(invoice.line_ids.mapped('matched_debit_ids.amount')) + sum(invoice.line_ids.mapped('matched_credit_ids.amount'))
-            reconcile_lines.append((0, 0, {
-                'payment_id': self.payment_id.id,
-                'invoice_id': invoice.id,
-                'already_paid': already_paid,
-                'amount_residual': invoice.amount_residual,
-                'amount_untaxed': invoice.amount_untaxed,
-                'amount_tax': invoice.amount_tax,
-                'currency_id': invoice.currency_id.id,
-                'amount_total': invoice.amount_total,
-            }))
+            # Verificar si la factura está seleccionada
+            if invoice.is_selected:
+                already_paid = sum(invoice.line_ids.mapped('matched_debit_ids.amount')) + sum(invoice.line_ids.mapped('matched_credit_ids.amount'))
+                reconcile_lines.append((0, 0, {
+                    'payment_id': self.payment_id.id,
+                    'invoice_id': invoice.id,
+                    'already_paid': already_paid,
+                    'amount_residual': invoice.amount_residual,
+                    'amount_untaxed': invoice.amount_untaxed,
+                    'amount_tax': invoice.amount_tax,
+                    'currency_id': invoice.currency_id.id,
+                    'amount_total': invoice.amount_total,
+                }))
         self.payment_id.reconcile_invoice_ids = reconcile_lines
         return {'type': 'ir.actions.act_window_close'}
-
-    @api.onchange('reconcile_invoice_ids')
-    def _onchnage_reconcile_invoice_ids(self):
-        payment_amount = 0.0
-        for line in self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0):
-            if self.currency_id != line.currency_id:
-                payment_amount += line.currency_id._convert(line.amount_paid, self.currency_id, self.env.company, self.date)
-            else:
-                payment_amount += line.amount_paid
-        self.amount = payment_amount
 
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
