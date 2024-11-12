@@ -128,6 +128,7 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
         self.payment_id.reconcile_invoice_ids = reconcile_lines
         return {'type': 'ir.actions.act_window_close'}
 
+
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
 
