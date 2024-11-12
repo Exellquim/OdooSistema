@@ -16,9 +16,6 @@ class AccountPayment(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {
-                'default_payment_id': self.id,
-                'default_partner_id': self.partner_id.id,
-                'default_payment_type': self.payment_type,
             },
         }
 
