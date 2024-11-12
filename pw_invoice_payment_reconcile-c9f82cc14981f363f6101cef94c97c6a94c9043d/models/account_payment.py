@@ -7,22 +7,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
-    reconcile_invoice_ids_all = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
-    search_text = fields.Char(string="Buscar Número de Factura")
 
-    def action_save_filtered_invoices(self):
-        # Filtra las facturas de reconcile_invoice_ids con amount_paid mayor a 0.00
-        filtered_invoices = self.reconcile_invoice_ids.filtered(lambda line: line.amount_paid > 0.00)
-        
-        # Actualiza reconcile_invoice_ids_all con las facturas encontradas
-        self.reconcile_invoice_ids_all = [(5, 0, 0)]  # Limpia las líneas actuales
-        self.reconcile_invoice_ids_all = [(0, 0, {
-            'invoice_id': line.invoice_id.id,
-            'amount_paid': line.amount_paid,
-            # Agrega otros campos necesarios si los hay
-        }) for line in filtered_invoices]
-
-    
     @api.onchange('partner_id', 'payment_type', 'partner_type')
     def _onchange_partner_id(self):
         if not self.partner_id:
@@ -63,7 +48,6 @@ class AccountPayment(models.Model):
         self.partner_id = partner_id.id
         return
 
-        
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
         payment_amount = 0.0
@@ -970,13 +954,3 @@ class AccountPaymentReconcile(models.Model):
                         payment.move_id.action_post()
 
         return res
-        
-class AccountPaymentReconcile(models.Model):
-    _inherit = 'account.payment.reconcile'
-
-    @api.onchange('amount_paid')
-    def _onchange_amount_paid(self):
-        """ Guarda el valor de amount_paid en la base de datos inmediatamente al cambiarlo """
-        if self.amount_paid:
-            self.write({'amount_paid': self.amount_paid})
-        
