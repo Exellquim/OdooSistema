@@ -8,6 +8,7 @@
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Invoice/Bills">
+                        <button name="open_invoice_selection_wizard" type="object" string="Select Invoices" class="oe_highlight"/>
                         <field name="reconcile_invoice_ids">
                             <tree editable="bottom" create="false">
                                 <field name="currency_id" invisible="1"/>
