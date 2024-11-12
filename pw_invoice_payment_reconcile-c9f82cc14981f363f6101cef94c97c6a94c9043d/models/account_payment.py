@@ -100,6 +100,7 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
         return res
 
     def action_add_invoices(self):
+        # Solo las facturas seleccionadas en el campo invoice_ids serán procesadas y guardadas.
         reconcile_lines = []
         for invoice in self.invoice_ids:
             already_paid = sum(invoice.line_ids.mapped('matched_debit_ids.amount')) + sum(invoice.line_ids.mapped('matched_credit_ids.amount'))
@@ -113,9 +114,10 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
                 'currency_id': invoice.currency_id.id,
                 'amount_total': invoice.amount_total,
             }))
+        
+        # Guardamos solo las líneas de reconciliación de las facturas seleccionadas en el campo reconcile_invoice_ids
         self.payment_id.reconcile_invoice_ids = reconcile_lines
         return {'type': 'ir.actions.act_window_close'}
-
 
 
 class AccountPaymentReconcile(models.Model):
