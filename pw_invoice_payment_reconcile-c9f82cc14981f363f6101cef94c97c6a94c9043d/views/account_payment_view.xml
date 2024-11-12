@@ -37,8 +37,8 @@
                 <field name="partner_id" readonly="1"/>
                 <field name="payment_type" readonly="1"/>
                 
-                <!-- Definir el campo Many2many para las facturas con el filtro adecuado -->
-                <field name="invoice_ids"  options="{'no_create': True}">
+                <!-- Campo Many2many para seleccionar las facturas -->
+                <field name="invoice_ids" options="{'no_create': True}">
                     <tree string="Invoices" editable="bottom">
                         <field name="name" string="Invoice"/>
                         <field name="invoice_date" string="Invoice Date"/>
@@ -54,6 +54,7 @@
         </form>
     </field>
 </record>
+
 
 
 <record id="action_account_payment_invoice_wizard" model="ir.actions.act_window">
