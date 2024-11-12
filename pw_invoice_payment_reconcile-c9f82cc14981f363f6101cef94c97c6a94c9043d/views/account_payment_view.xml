@@ -36,9 +36,10 @@
                 <field name="payment_id" invisible="1"/>
                 <field name="partner_id" readonly="1"/>
                 <field name="payment_type" readonly="1"/>
-                <!-- Mostrar la vista tree con las facturas del cliente -->
-                <field name="invoice_ids" mode="tree">
-                    <tree string="Invoices">
+                
+                <!-- Definir el campo Many2many para las facturas con el filtro adecuado -->
+                <field name="invoice_ids"  options="{'no_create': True}">
+                    <tree string="Invoices" editable="bottom">
                         <field name="name" string="Invoice"/>
                         <field name="invoice_date" string="Invoice Date"/>
                         <field name="amount_total" string="Total Amount"/>
@@ -53,7 +54,6 @@
         </form>
     </field>
 </record>
-
 
 
 <record id="action_account_payment_invoice_wizard" model="ir.actions.act_window">
