@@ -118,6 +118,16 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
         self.payment_id.reconcile_invoice_ids = reconcile_lines
         return {'type': 'ir.actions.act_window_close'}
 
+    @api.onchange('reconcile_invoice_ids')
+    def _onchnage_reconcile_invoice_ids(self):
+        payment_amount = 0.0
+        for line in self.reconcile_invoice_ids.filtered(lambda x: x.amount_paid > 0):
+            if self.currency_id != line.currency_id:
+                payment_amount += line.currency_id._convert(line.amount_paid, self.currency_id, self.env.company, self.date)
+            else:
+                payment_amount += line.amount_paid
+        self.amount = payment_amount
+
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
 
