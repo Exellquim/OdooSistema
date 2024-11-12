@@ -76,7 +76,7 @@ class AccountPayment(models.Model):
             move_lines.filtered(lambda x: not x.reconciled).reconcile()
 
         return res
-
+        
 class AccountPaymentInvoiceWizard(models.TransientModel):
     _name = 'account.payment.invoice.wizard'
     _description = 'Wizard for selecting invoices for payment reconciliation'
@@ -84,45 +84,39 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
     payment_id = fields.Many2one('account.payment', string="Payment")
     invoice_ids = fields.Many2many(
         'account.move', string="Invoices",
-        domain="[('partner_id', '=', partner_id),"
-           " ('state', '=', 'posted'),"
-           " ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),"
-           " ('move_type', '=', move_type[payment_type])]"
+        domain="[('partner_id', '=', partner_id), ('state', '=', 'posted'), ('payment_state', 'not in', ['paid', 'reversed', 'in_payment'])]"
     )
     partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
     payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
 
-    @api.model
-    def default_get(self, fields):
-        res = super(AccountPaymentInvoiceWizard, self).default_get(fields)
-        payment_id = self.env.context.get('active_id')
-        if payment_id:
-            payment = self.env['account.payment'].browse(payment_id)
-            res.update({
-                'payment_id': payment_id,
-            })
-        return res
+    @api.onchange('partner_id', 'payment_type')
+    def _onchange_partner_id_payment_type(self):
+        """Este método filtra `invoice_ids` dinámicamente según `partner_id` y `payment_type`."""
+        if self.partner_id and self.payment_type:
+            # Define el mapeo de `move_type` según `payment_type`
+            move_type_map = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
+            move_type = move_type_map.get(self.payment_type, False)
+            
+            # Aplica el filtro solo si `move_type` es válido
+            if move_type:
+                invoices = self.env['account.move'].search([
+                    ('partner_id', '=', self.partner_id.id),
+                    ('state', '=', 'posted'),
+                    ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
+                    ('move_type', '=', move_type)
+                ])
+                # Asigna las facturas encontradas a `invoice_ids`
+                self.invoice_ids = [(6, 0, invoices.ids)]
+            else:
+                # Limpia `invoice_ids` si no hay `move_type` válido
+                self.invoice_ids = [(5, 0, 0)]
+        else:
+            # Limpia `invoice_ids` si faltan `partner_id` o `payment_type`
+            self.invoice_ids = [(5, 0, 0)]
 
     def action_add_invoices(self):
-        # Solo las facturas seleccionadas en el campo invoice_ids serán procesadas y guardadas.
-        reconcile_lines = []
-        for invoice in self.invoice_ids:
-            already_paid = sum(invoice.line_ids.mapped('matched_debit_ids.amount')) + sum(invoice.line_ids.mapped('matched_credit_ids.amount'))
-            reconcile_lines.append((0, 0, {
-                'payment_id': self.payment_id.id,
-                'invoice_id': invoice.id,
-                'already_paid': already_paid,
-                'amount_residual': invoice.amount_residual,
-                'amount_untaxed': invoice.amount_untaxed,
-                'amount_tax': invoice.amount_tax,
-                'currency_id': invoice.currency_id.id,
-                'amount_total': invoice.amount_total,
-            }))
-        
-        # Guardamos solo las líneas de reconciliación de las facturas seleccionadas en el campo reconcile_invoice_ids
-        self.payment_id.reconcile_invoice_ids = reconcile_lines
-        return {'type': 'ir.actions.act_window_close'}
-
+        # Lógica para agregar las facturas seleccionadas en `invoice_ids`
+        pass
 
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
