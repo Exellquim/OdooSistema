@@ -5,10 +5,27 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <!-- Campo de búsqueda -->
+                <group>
                 <group>
                     <field name="search_text" placeholder="Ingrese número de factura para buscar..." />
                 </group>
+                <group>
+                <button name="action_save_filtered_invoices" string="Guardar Facturas" type="object" class="btn-primary"/>
+                </group>
+                </group>
+            <field name="reconcile_invoice_ids_all" options="{'reload_on_save': True}">
+    <tree editable="bottom" create="false">
+        <field name="currency_id" invisible="1"/>
+        <field name="invoice_id" string="Número" readonly="1"/>
+        <field name="amount_untaxed" readonly="1"/>
+        <field name="amount_tax" readonly="1"/>
+        <field name="amount_total" readonly="1"/>
+        <field name="already_paid" readonly="1"/>
+        <field name="amount_residual" readonly="1"/>
+        <field name="amount_paid" readonly="1"/> <!-- Puedes dejarlo como readonly para evitar ediciones -->
+    </tree>
+</field>
+
 
                 <!-- Vista de reconciliaciones -->
                 <field name="reconcile_invoice_ids" options="{'reload_on_save': True}">
