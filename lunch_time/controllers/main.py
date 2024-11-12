@@ -35,7 +35,7 @@ class LunchTime(http.Controller):
             current_time = current_time_utc  # Si no hay zona horaria, usar UTC
 
         # Convertir a naive datetime antes de guardar
-        naive_current_time = current_time.replace(tzinfo=None)
+        naive_current_time = current_time.replace(tzinfo=None) + timedelta(hours=6)
 
         # Definir el inicio y fin del día actual
         start_of_extended_day = naive_current_time.replace(hour=0, minute=0, second=0) - timedelta(hours=6)
