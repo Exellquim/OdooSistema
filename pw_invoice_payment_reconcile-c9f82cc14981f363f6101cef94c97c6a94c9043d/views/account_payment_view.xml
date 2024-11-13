@@ -35,7 +35,7 @@
             <group>
                 <field name="payment_id" invisible="1"/>
                 <field name="partner_id" readonly="1"/>
-                <field name="payment_type" readonly="1"/>
+                <field name="payment_type" readonly="1" invisible="1"/>
                 
                 <!-- Campo Many2many para seleccionar las facturas -->
                 <field name="invoice_ids" options="{'no_create': True}">
