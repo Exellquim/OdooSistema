@@ -8,45 +8,16 @@ class AccountPayment(models.Model):
 
     reconcile_invoice_ids = fields.One2many('account.payment.reconcile', 'payment_id', string="Invoices", copy=False)
 
-    @api.onchange('partner_id', 'payment_type', 'partner_type')
-    def _onchange_partner_id(self):
-        if not self.partner_id:
-            return
-
-        partner_id = self.partner_id
-        self.reconcile_invoice_ids = [(5,)]  # Elimina todas las reconciliaciones anteriores
-
-        move_type = {'outbound': 'in_invoice', 'inbound': 'out_invoice'}
-        moves = self.env['account.move'].sudo().search(
-            [('partner_id', '=', self.partner_id.id),
-             ('state', '=', 'posted'),
-             ('payment_state', 'not in', ['paid', 'reversed', 'in_payment']),
-             ('move_type', '=', move_type[self.payment_type])])
-
-        vals = []
-        for move in moves:
-            already_paid = 0.0
-            # Calculamos el total pagado a través de las reconciliaciones en las líneas contables
-            for line in move.line_ids:
-                # Sumar los pagos reconciliados en débitos y créditos
-                already_paid += sum(line.matched_debit_ids.mapped('amount')) + sum(line.matched_credit_ids.mapped('amount'))
-
-            # Agregar los valores de reconciliación de facturas a la lista
-            vals.append((0, 0, {
-                'payment_id': self.id,
-                'invoice_id': move.id,
-                'already_paid': already_paid,  # Monto ya pagado
-                'amount_residual': move.amount_residual,
-                'amount_untaxed': move.amount_untaxed,
-                'amount_tax': move.amount_tax,
-                'currency_id': move.currency_id.id,
-                'amount_total': move.amount_total,
-            }))
-
-        # Asignar los valores calculados a la línea de reconciliación
-        self.reconcile_invoice_ids = vals
-        self.partner_id = partner_id.id
-        return
+    def open_invoice_selection_wizard(self):
+        return {
+            'name': 'Select Invoices for Payment',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.payment.invoice.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+            },
+        }
 
     @api.onchange('reconcile_invoice_ids')
     def _onchnage_reconcile_invoice_ids(self):
@@ -57,6 +28,7 @@ class AccountPayment(models.Model):
             else:
                 payment_amount += line.amount_paid
         self.amount = payment_amount
+
 
     def action_post(self, *args, **kwargs):
         # Llamar a la implementación original de action_post
@@ -105,6 +77,65 @@ class AccountPayment(models.Model):
 
         return res
         
+class AccountPaymentInvoiceWizard(models.TransientModel):
+    _name = 'account.payment.invoice.wizard'
+    _description = 'Wizard for selecting invoices for payment reconciliation'
+
+    payment_id = fields.Many2one('account.payment', string="Payment")
+    invoice_ids = fields.Many2many(
+        'account.move', string="Invoices",
+        domain="[('partner_id', '=', partner_id), ('state', '=', 'posted'), ('payment_state', 'not in', ['paid', 'reversed', 'in_payment'])]"
+    )
+    partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
+    payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
+
+class AccountPaymentInvoiceWizard(models.TransientModel):
+    _name = 'account.payment.invoice.wizard'
+    _description = 'Wizard for selecting invoices for payment reconciliation'
+
+    payment_id = fields.Many2one('account.payment', string="Payment")
+    invoice_ids = fields.Many2many(
+    'account.move', string="Invoices",
+    domain="[('partner_id', '=', partner_id), ('state', '=', 'posted'), "
+            "('payment_state', 'not in', ['paid', 'reversed', 'in_payment']), "
+            "('move_type', 'in', ['out_invoice', 'in_invoice'])]"
+    )
+
+    partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
+    payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
+
+    @api.model
+    def default_get(self, fields):
+        res = super(AccountPaymentInvoiceWizard, self).default_get(fields)
+        payment_id = self.env.context.get('active_id')
+        if payment_id:
+            payment = self.env['account.payment'].browse(payment_id)
+            res.update({
+                'payment_id': payment_id,
+            })
+        return res
+
+    def action_add_invoices(self):
+        # Solo las facturas seleccionadas en el campo invoice_ids serán procesadas y guardadas.
+        reconcile_lines = []
+        for invoice in self.invoice_ids:
+            already_paid = sum(invoice.line_ids.mapped('matched_debit_ids.amount')) + sum(invoice.line_ids.mapped('matched_credit_ids.amount'))
+            reconcile_lines.append((0, 0, {
+                'payment_id': self.payment_id.id,
+                'invoice_id': invoice.id,
+                'already_paid': already_paid,
+                'amount_residual': invoice.amount_residual,
+                'amount_untaxed': invoice.amount_untaxed,
+                'amount_tax': invoice.amount_tax,
+                'currency_id': invoice.currency_id.id,
+                'amount_total': invoice.amount_total,
+            }))
+        
+        # Guardamos solo las líneas de reconciliación de las facturas seleccionadas en el campo reconcile_invoice_ids
+        self.payment_id.reconcile_invoice_ids = reconcile_lines
+        return {'type': 'ir.actions.act_window_close'}
+
+
 class AccountPaymentReconcile(models.Model):
     _name = 'account.payment.reconcile'
 
