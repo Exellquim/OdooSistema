@@ -36,6 +36,7 @@ class LunchTime(http.Controller):
 
         # Convertir a naive datetime antes de guardar
         naive_current_time = current_time.replace(tzinfo=None) + timedelta(hours=6)
+        naive_current_time_sin = current_time.replace(tzinfo=None)
 
         # Definir el inicio y fin del día actual
         start_of_extended_day = naive_current_time.replace(hour=0, minute=0, second=0) - timedelta(hours=6)
@@ -62,6 +63,6 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': naive_current_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': naive_current_time_sin.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
