@@ -81,12 +81,12 @@ class AccountPaymentInvoiceWizard(models.TransientModel):
     _name = 'account.payment.invoice.wizard'
     _description = 'Wizard for selecting invoices for payment reconciliation'
 
-    payment_id = fields.Many2one('account.payment', string="Payment")
+    payment_id = fields.Many2one('account.payment', string="Pago")
     invoice_ids = fields.Many2many(
-        'account.move', string="Invoices",
+        'account.move', string="Facturas",
         domain="[('partner_id', '=', partner_id), ('state', '=', 'posted'), ('payment_state', 'not in', ['paid', 'reversed', 'in_payment'])]"
     )
-    partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Partner", readonly=True)
+    partner_id = fields.Many2one('res.partner', related='payment_id.partner_id', string="Cliente", readonly=True)
     payment_type = fields.Selection(related='payment_id.payment_type', readonly=True)
 
 class AccountPaymentInvoiceWizard(models.TransientModel):
