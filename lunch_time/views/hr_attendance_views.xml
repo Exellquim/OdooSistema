@@ -116,7 +116,7 @@
                             <!-- Nombre del empleado -->
                             <h3 style="color: white; margin-top: 20px;"><t t-esc="employee_name"/></h3>
                             <!-- Hora actual -->
-                            <p style="color: white;"><t t-esc="current_time_utc"/></p>
+                            <p style="color: white;"><t t-esc="current_time"/></p>
                         </div>
                         </div>
                         </div>
