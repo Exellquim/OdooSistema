@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+          <!--<record id="stock_move_operations_inherit" model="ir.ui.view">
+            <field name="name">stock_move_operations_inherit</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="mrp.view_stock_move_operations_raw"/>
+            <field name="arch" type="xml">
+		     <xpath expr="//field[@name='quantity_done']" position="after">
+              <button name="mostrar_lotes" string="Actualizar Lista" type="object"/>
+              <button name="actualizar_valores" string="Validar Datos" type="object"/>
+		     </xpath>
+            </field>
+          </record>-->
+
+        <record id="stock_move_operations_inherit" model="ir.ui.view">
+    <field name="name">stock_move_operations_inherit</field>
+    <field name="model">stock.move</field>
+    <field name="inherit_id" ref="mrp.view_stock_move_operations_raw"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='quantity_done']" position="after">
+            <div class="row">
+                <!-- Columna izquierda: campo quantity_done -->
+                <div class="col-sm-6 mt-3">
+                     <button name="actualizar_valores" string="Validar Datos" type="object" class="btn btn-primary"/>
+                </div>
+                <!-- Columna derecha: botones -->
+                <div class="col-sm-6 mt-3">
+                    <button name="mostrar_lotes" string="Actualizar Lista" type="object" class="btn btn-primary"/>
+                </div>
+            </div>
+        </xpath>
+    </field>
+</record>
+
+
+
+
+
+
+    <record id="stock_move_operations_inherit2" model="ir.ui.view">
+    <field name="name">stock_move_operations_inherit2</field>
+    <field name="model">stock.move</field>
+    <field name="inherit_id" ref="mrp.view_stock_move_operations_raw"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='quantity_done']" position="after">
+                 <div>
+                    <field name="lote"/> <!-- Nombre del lote -->
+                     <field name="cantidad"/> <!-- Cantidad del lote -->
+                 </div>
+
+
+        </xpath>
+    </field>
+</record>
+    </data>
+</odoo>
