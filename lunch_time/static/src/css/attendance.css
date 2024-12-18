@@ -1,0 +1,63 @@
+.attendance-page .center-box {
+    background-color: transparent;
+}
+.attendance-page .center-box h1 {
+    font-size: 2.5em; /* Tamaño de la fuente para el título */
+    margin-bottom: 20px; /* Margen inferior */
+}
+
+.attendance-page .center-box h3 {
+    font-size: 1.5em; /* Tamaño de la fuente para el subtítulo */
+    margin-bottom: 20px; /* Margen inferior */
+    text-align: left; /* Alinear texto a la izquierda */
+    background-color: transparent;
+}
+
+.attendance-page .center-box .form-group {
+    margin-bottom: 200px; /* Margen inferior para el grupo de formulario */
+    text-align: left; /* Alinear contenido a la izquierda */
+    background-color: transparent;
+}
+
+.attendance-page .center-box .form-control {
+    width: 20%; /* Ancho del campo de entrada */
+    padding: 10px; /* Espaciado interno */
+    font-size: 1em; /* Tamaño de la fuente */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    text-align: left; /* Alinear texto a la izquierda */
+}
+
+
+.attendance-page .center-box .btn:hover {
+    background-color: #4b2e8d; /* Color de fondo del botón al pasar el mouse */
+}
+
+.attendance-page .text-danger {
+    color: #e74c3c; /* Color de texto para mensajes de error */
+}
+
+/* Estilos para simular un lector de barras */
+    input[name="barcode"] {
+        padding: 12px 15px; /* Espacio interno */
+        border: 1px solid #ccc; /* Borde gris */
+        border-radius: 4px; /* Bordes redondeados */
+        font-size: 16px; /* Tamaño de fuente */
+        width: 300px; /* Ancho del campo */
+        background-color: #f7f7f7; /* Color de fondo */
+        background-image: linear-gradient(to bottom, #ffffff, #f2f2f2); /* Gradiente de fondo */
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Sombra interna */
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transiciones */
+    }
+
+    input[name="barcode"]:focus {
+        border-color: #66afe9; /* Cambia el color del borde al enfocar */
+        outline: 0; /* Quita el borde de enfoque */
+        box-shadow: 0 0 5px rgba(102, 175, 233, 0.6); /* Sombra al enfocar */
+    }
+
+    /* Estilo para el placeholder */
+    ::placeholder {
+        color: #aaa; /* Color del texto del placeholder */
+    }
+
