@@ -1,6 +1,7 @@
 {
     'name': 'Lunch Time',
-    'version': '1.0',
+    'version': '18.0.1.0.0',  # Indica la versión del módulo (Odoo 18)
+    'license': 'LGPL-3',
     'summary': 'Module for managing lunch times',
     'sequence': 10,
     'description': 'This module allows employees to manage their lunch times',
