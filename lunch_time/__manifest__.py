@@ -24,6 +24,7 @@
         'web.assets_frontend': [
             # 'lunch_time/static/src/css/attendance.css',  
         ],
+        
     },
     'license': 'LGPL-3',
 }
