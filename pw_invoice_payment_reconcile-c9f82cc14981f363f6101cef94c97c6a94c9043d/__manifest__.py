@@ -21,4 +21,5 @@ This module allows you to partially or fully reconcile multiple invoices/bills d
     'auto_install': False,  
     'live_test_url': 'https://youtu.be/M9UioY72xko',  
     'images': ['static/description/Banner.png'], 
+    
 }
