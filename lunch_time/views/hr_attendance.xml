@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <!-- Actualizar la vista tree de hr.attendance -->
+        <record id="view_hr_attendance_tree_inherited" model="ir.ui.view">
+            <field name="name">hr.attendance.tree.inherited</field>
+            <field name="model">hr.attendance</field>
+            <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+            <field name="arch" type="xml">
+                <!-- Insertar los nuevos campos después del campo check_in -->
+                <xpath expr="//field[@name='check_in']" position="after">
+                    <field name="hora_de_comida"/>
+                    <field name="regreso_de_comida"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
