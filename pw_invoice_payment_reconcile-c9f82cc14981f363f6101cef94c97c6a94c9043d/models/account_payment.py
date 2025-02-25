@@ -160,10 +160,10 @@ class AccountPaymentReconcile(models.Model):
     amount_residual = fields.Monetary('Amount Due')
     amount_paid = fields.Monetary(string="Payment Amount")
 
-    #@api.onchange('amount_paid')
-    #def _onchange_amount_paid(self):
-    #    if self.amount_paid >= self.amount_residual:
-    #        raise ValidationError(_('You cannot pay more than residual amount.'))
+    @api.onchange('amount_paid')
+    def _onchange_amount_paid(self):
+        if self.amount_paid >= self.amount_residual:
+            raise ValidationError(_('You cannot pay more than residual amount.'))
 
     def pw_action_post_custom(self):
         for payment in self:
