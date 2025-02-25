@@ -162,8 +162,12 @@ class AccountPaymentReconcile(models.Model):
 
     @api.onchange('amount_paid')
     def _onchange_amount_paid(self):
-        if self.amount_paid >= self.amount_residual:
-            raise ValidationError(_('You cannot pay more than residual amount.'))
+        """Valida que el monto pagado no sea mayor que el monto residual."""
+        amount_paid = round(self.amount_paid, 2)  # Redondear a 2 decimales
+        amount_residual = round(self.amount_residual, 2)  # Redondear a 2 decimales
+
+        if amount_paid > amount_residual:
+            raise ValidationError(_('You cannot pay more than the residual amount.'))
 
     def pw_action_post_custom(self):
         for payment in self:
