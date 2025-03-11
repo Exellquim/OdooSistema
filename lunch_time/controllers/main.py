@@ -37,11 +37,11 @@ class LunchTime(http.Controller):
         start_of_day_mx = naive_current_time.replace(hour=0, minute=0, second=0)
         end_of_day_mx = naive_current_time.replace(hour=23, minute=59, second=59)
 
-        # Buscar registros de asistencia dentro del día en horario de México
+        # Convertir check_in almacenado a la zona horaria de México para la búsqueda
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', start_of_day_mx.astimezone(mexico_tz).replace(tzinfo=None)),
-            ('check_in', '<=', end_of_day_mx.astimezone(mexico_tz).replace(tzinfo=None))
+            ('check_in', '>=', start_of_day_mx),
+            ('check_in', '<=', end_of_day_mx)
         ], limit=1)
 
         if attendance:
@@ -58,6 +58,6 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': naive_current_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': current_time_mx.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
