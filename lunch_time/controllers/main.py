@@ -46,10 +46,10 @@ class LunchTime(http.Controller):
 
         if attendance:
             if attendance.hora_de_comida:
-                attendance.sudo().write({'regreso_de_comida': naive_current_time})
+                attendance.sudo().write({'regreso_de_comida': current_time_mx})
                 message = 'Su hora de regreso ha sido registrada'
             else:
-                attendance.sudo().write({'hora_de_comida': naive_current_time})
+                attendance.sudo().write({'hora_de_comida': current_time_mx})
                 message = 'Su hora de comida ha sido registrada'
         else:
             return request.render('lunch_time.attendance_page', {
