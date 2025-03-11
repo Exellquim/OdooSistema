@@ -23,11 +23,11 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Obtener la hora actual en UTC
-        current_time_utc = datetime.now(pytz.utc)
-
-        # Convertir a la zona horaria de México
+        # Definir la zona horaria de México
         mexico_tz = pytz.timezone('America/Mexico_City')
+
+        # Obtener la hora actual en UTC y convertir a la zona horaria de México
+        current_time_utc = datetime.now(pytz.utc)
         current_time_mx = current_time_utc.astimezone(mexico_tz)
 
         # Convertir a naive datetime antes de guardar
@@ -40,8 +40,8 @@ class LunchTime(http.Controller):
         # Buscar registros de asistencia dentro del día en horario de México
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', start_of_day_mx),
-            ('check_in', '<=', end_of_day_mx)
+            ('check_in', '>=', start_of_day_mx.astimezone(mexico_tz).replace(tzinfo=None)),
+            ('check_in', '<=', end_of_day_mx.astimezone(mexico_tz).replace(tzinfo=None))
         ], limit=1)
 
         if attendance:
