@@ -26,27 +26,22 @@ class LunchTime(http.Controller):
         # Obtener la hora actual en UTC
         current_time_utc = datetime.now(pytz.utc)
 
-        # Convertir a la zona horaria del usuario
-        tz = request.env.user.tz  # Obtener la zona horaria del usuario
-        if tz:
-            user_tz = pytz.timezone(tz)
-            current_time = current_time_utc.astimezone(user_tz)
-        else:
-            current_time = current_time_utc  # Si no hay zona horaria, usar UTC
+        # Convertir a la zona horaria de México
+        mexico_tz = pytz.timezone('America/Mexico_City')
+        current_time_mx = current_time_utc.astimezone(mexico_tz)
 
         # Convertir a naive datetime antes de guardar
-        naive_current_time = current_time.replace(tzinfo=None) + timedelta(hours=6)
-        naive_current_time_sin = current_time.replace(tzinfo=None)
+        naive_current_time = current_time_mx.replace(tzinfo=None)
 
-        # Definir el inicio y fin del día actual
-        start_of_extended_day = naive_current_time.replace(hour=0, minute=0, second=0) - timedelta(hours=6)
-        end_of_extended_day = naive_current_time.replace(hour=0, minute=0, second=0) + timedelta(days=1, hours=6)
+        # Definir el inicio y fin del día actual en la zona horaria de México
+        start_of_day_mx = naive_current_time.replace(hour=0, minute=0, second=0)
+        end_of_day_mx = naive_current_time.replace(hour=23, minute=59, second=59)
 
-        # Buscar registros de asistencia
+        # Buscar registros de asistencia dentro del día en horario de México
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', start_of_extended_day),
-            ('check_in', '<=', end_of_extended_day)
+            ('check_in', '>=', start_of_day_mx),
+            ('check_in', '<=', end_of_day_mx)
         ], limit=1)
 
         if attendance:
@@ -63,6 +58,6 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': naive_current_time_sin.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': naive_current_time.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
