@@ -1,7 +1,8 @@
 from odoo import http
 from odoo.http import request
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz  # Importar pytz para el manejo de zonas horarias
+from pytz import timezone, UTC
 
 class LunchTime(http.Controller):
 
@@ -26,8 +27,8 @@ class LunchTime(http.Controller):
         # Definir la zona horaria de México
         tz = pytz.timezone('America/Mexico_City')
 
-        # Obtener la hora actual en la zona horaria de México
-        current_time_mx = datetime.now(tz)
+        # Obtener la hora actual en la zona horaria de México correctamente
+        current_time_mx = datetime.now().astimezone(tz)
 
         # Convertir a naive datetime antes de guardar
         naive_current_time = current_time_mx.replace(tzinfo=None)
