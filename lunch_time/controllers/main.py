@@ -24,20 +24,19 @@ class LunchTime(http.Controller):
             })
 
         # Definir la zona horaria de México
-        mexico_tz = pytz.timezone('America/Mexico_City')
+        tz = pytz.timezone('America/Mexico_City')
 
-        # Obtener la hora actual en UTC y convertir a la zona horaria de México
-        current_time_utc = datetime.now(pytz.utc)
-        current_time_mx = current_time_utc.astimezone(mexico_tz)
+        # Obtener la hora actual en la zona horaria de México
+        current_time_mx = datetime.now(tz)
 
         # Convertir a naive datetime antes de guardar
         naive_current_time = current_time_mx.replace(tzinfo=None)
 
         # Definir el inicio y fin del día actual en la zona horaria de México
-        start_of_day_mx = naive_current_time.replace(hour=0, minute=0, second=0)
-        end_of_day_mx = naive_current_time.replace(hour=23, minute=59, second=59)
+        start_of_day_mx = naive_current_time.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day_mx = naive_current_time.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        # Convertir check_in almacenado a la zona horaria de México para la búsqueda
+        # Buscar registros de asistencia dentro del día en horario de México
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
             ('check_in', '>=', start_of_day_mx),
