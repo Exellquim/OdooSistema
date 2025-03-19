@@ -5,5 +5,11 @@ class HrAttendance(models.Model):
 
     hora_de_comida = fields.Datetime(string="Hora de Comida")
     regreso_de_comida = fields.Datetime(string="Regreso de Comida")
+    registro = fields.Date(string="Registro fecha", compute="_compute_registro", store=True)
+
+    @api.depends('check_in')
+    def _compute_registro(self):
+        for record in self:
+            record.registro = record.check_in.date() if record.check_in else False
 
 
