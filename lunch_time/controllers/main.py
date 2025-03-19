@@ -1,7 +1,7 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime
-import pytz  # Importar pytz para el manejo de zonas horarias
+import pytz
 
 class LunchTime(http.Controller):
 
@@ -23,37 +23,35 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Definir la zona horaria de México
-        tz = pytz.timezone('America/Mexico_City')
+        # Obtener la fecha actual en la zona horaria del usuario
+        tz = request.env.user.tz or 'UTC'
+        user_tz = pytz.timezone(tz)
+        current_time = datetime.now(user_tz)
+        today_date = current_time.date()
 
-        # Obtener la hora actual en la zona horaria de México correctamente
-        current_time_mx = datetime.now(tz)
-
-        # Definir el inicio y fin del día actual en la zona horaria de México
-        start_of_day_mx = current_time_mx.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_day_mx = current_time_mx.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-        # Buscar registros de asistencia dentro del día en horario de México
+        # Buscar la asistencia del día solo por empleado y registro (ya calculado)
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
-            ('check_in', '>=', start_of_day_mx.replace(tzinfo=None)),
-            ('check_in', '<=', end_of_day_mx.replace(tzinfo=None))
+            ('registro', '=', today_date)
         ], limit=1)
 
-        if attendance:
-            if attendance.hora_de_comida:
-                attendance.sudo().write({'regreso_de_comida': current_time_mx.replace(tzinfo=None)})
-                message = 'Su hora de regreso ha sido registrada'
-            else:
-                attendance.sudo().write({'hora_de_comida': current_time_mx.replace(tzinfo=None)})
-                message = 'Su hora de comida ha sido registrada'
-        else:
+        if not attendance:
             return request.render('lunch_time.attendance_page', {
                 'error': 'No se encontró un registro de asistencia para hoy.'
             })
 
+        # Registrar hora de comida o regreso de comida
+        if not attendance.hora_de_comida:
+            attendance.sudo().write({'hora_de_comida': current_time.replace(tzinfo=None)})
+            message = 'Su hora de comida ha sido registrada'
+        elif not attendance.regreso_de_comida:
+            attendance.sudo().write({'regreso_de_comida': current_time.replace(tzinfo=None)})
+            message = 'Su hora de regreso ha sido registrada'
+        else:
+            message = 'Ya registró su hora de comida y regreso.'
+
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': current_time_mx.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': current_time.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
