@@ -23,10 +23,9 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Obtener la fecha actual en la zona horaria del usuario
-        tz = request.env.user.tz or 'UTC'
-        user_tz = pytz.timezone(tz)
-        current_time = datetime.now(user_tz)
+        # Obtener la fecha y hora exacta en la zona horaria de México
+        tz = pytz.timezone('America/Mexico_City')  # Zona horaria de México
+        current_time = datetime.now(tz)  # Obtener la hora en la zona horaria de México
         today_date = current_time.date()
 
         # Buscar la asistencia del día solo por empleado y registro (ya calculado)
@@ -40,13 +39,19 @@ class LunchTime(http.Controller):
                 'error': 'No se encontró un registro de asistencia para hoy.'
             })
 
-        # Registrar hora de comida o regreso de comida
+        # Si la hora de comida no ha sido registrada, la registramos
         if not attendance.hora_de_comida:
+            # Usar la hora exacta en la zona horaria de México para registrar la hora de comida
             attendance.sudo().write({'hora_de_comida': current_time.replace(tzinfo=None)})
-            message = 'Su hora de comida ha sido registrada'
+            message = 'Su hora de comida ha sido registrada.'
+        
+        # Si la hora de regreso de comida no ha sido registrada, la registramos
         elif not attendance.regreso_de_comida:
+            # Usar la hora exacta en la zona horaria de México para registrar la hora de regreso de comida
             attendance.sudo().write({'regreso_de_comida': current_time.replace(tzinfo=None)})
-            message = 'Su hora de regreso ha sido registrada'
+            message = 'Su hora de regreso de comida ha sido registrada.'
+        
+        # Si ambos ya están registrados
         else:
             message = 'Ya registró su hora de comida y regreso.'
 
