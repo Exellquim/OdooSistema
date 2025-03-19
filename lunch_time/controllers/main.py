@@ -1,6 +1,6 @@
 from odoo import http
 from odoo.http import request
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 class LunchTime(http.Controller):
@@ -30,8 +30,11 @@ class LunchTime(http.Controller):
         current_time = datetime.now(tz)
         today_date = current_time.date()
 
-        # Convertir la hora de comida y regreso a la zona horaria de México
-        naive_current_time = current_time.replace(tzinfo=None)  # Convertir a naive antes de registrar
+        # Sumar 6 horas a la hora actual
+        current_time_plus_6 = current_time + timedelta(hours=6)
+
+        # Convertir la hora a naive (sin zona horaria) para registrarla correctamente
+        naive_current_time_plus_6 = current_time_plus_6.replace(tzinfo=None)
 
         # Buscar la asistencia del día solo por empleado y registro (ya calculado)
         attendance = request.env['hr.attendance'].sudo().search([
@@ -44,24 +47,28 @@ class LunchTime(http.Controller):
                 'error': 'No se encontró un registro de asistencia para hoy.'
             })
 
-        # Registrar hora de comida si no ha sido registrada
+        # Si la hora de comida no ha sido registrada, la registramos
         if not attendance.hora_de_comida:
-            # Ya hemos convertido la hora a naive y la registramos
-            attendance.sudo().write({'hora_de_comida': naive_current_time})
+            # Registrar hora de comida
+            attendance.sudo().write({'hora_de_comida': naive_current_time_plus_6})
             message = 'Su hora de comida ha sido registrada.'
         
-        # Registrar hora de regreso de comida si no ha sido registrada
+        # Si la hora de regreso de comida no ha sido registrada, la registramos
         elif not attendance.regreso_de_comida:
-            # Ya hemos convertido la hora a naive y la registramos
-            attendance.sudo().write({'regreso_de_comida': naive_current_time})
-            message = 'Su hora de regreso de comida ha sido registrada.'
-        
+            # Validamos que ya exista la hora de comida registrada
+            if attendance.hora_de_comida:
+                attendance.sudo().write({'regreso_de_comida': naive_current_time_plus_6})
+                message = 'Su hora de regreso de comida ha sido registrada.'
+            else:
+                message = 'Debe registrar primero la hora de comida.'
+
         # Si ambos ya están registrados
         else:
             message = 'Ya registró su hora de comida y regreso.'
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': naive_current_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': naive_current_time_plus_6.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
+
