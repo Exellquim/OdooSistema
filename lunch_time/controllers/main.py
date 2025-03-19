@@ -23,13 +23,15 @@ class LunchTime(http.Controller):
                 'error': 'Empleado no encontrado.'
             })
 
-        # Obtener la fecha y hora exacta en la zona horaria de México
-        tz = pytz.timezone('America/Mexico_City')  # Zona horaria de México
-        current_time = datetime.now(tz)  # Obtener la hora en la zona horaria de México
+        # Obtener la zona horaria de México
+        tz = pytz.timezone('America/Mexico_City')
+
+        # Obtener la hora actual en la zona horaria de México
+        current_time = datetime.now(tz)
         today_date = current_time.date()
 
-        # Ajustar la hora para que se registre correctamente en la base de datos sin zona horaria
-        naive_current_time = current_time.replace(tzinfo=None)
+        # Convertir la hora de comida y regreso a la zona horaria de México
+        naive_current_time = current_time.replace(tzinfo=None)  # Convertir a naive antes de registrar
 
         # Buscar la asistencia del día solo por empleado y registro (ya calculado)
         attendance = request.env['hr.attendance'].sudo().search([
@@ -42,15 +44,15 @@ class LunchTime(http.Controller):
                 'error': 'No se encontró un registro de asistencia para hoy.'
             })
 
-        # Si la hora de comida no ha sido registrada, la registramos
+        # Registrar hora de comida si no ha sido registrada
         if not attendance.hora_de_comida:
-            # Usar la hora exacta en la zona horaria de México para registrar la hora de comida
+            # Ya hemos convertido la hora a naive y la registramos
             attendance.sudo().write({'hora_de_comida': naive_current_time})
             message = 'Su hora de comida ha sido registrada.'
         
-        # Si la hora de regreso de comida no ha sido registrada, la registramos
+        # Registrar hora de regreso de comida si no ha sido registrada
         elif not attendance.regreso_de_comida:
-            # Usar la hora exacta en la zona horaria de México para registrar la hora de regreso de comida
+            # Ya hemos convertido la hora a naive y la registramos
             attendance.sudo().write({'regreso_de_comida': naive_current_time})
             message = 'Su hora de regreso de comida ha sido registrada.'
         
