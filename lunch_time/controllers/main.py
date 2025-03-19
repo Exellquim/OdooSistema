@@ -28,6 +28,9 @@ class LunchTime(http.Controller):
         current_time = datetime.now(tz)  # Obtener la hora en la zona horaria de México
         today_date = current_time.date()
 
+        # Ajustar la hora para que se registre correctamente en la base de datos sin zona horaria
+        naive_current_time = current_time.replace(tzinfo=None)
+
         # Buscar la asistencia del día solo por empleado y registro (ya calculado)
         attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', employee.id),
@@ -42,13 +45,13 @@ class LunchTime(http.Controller):
         # Si la hora de comida no ha sido registrada, la registramos
         if not attendance.hora_de_comida:
             # Usar la hora exacta en la zona horaria de México para registrar la hora de comida
-            attendance.sudo().write({'hora_de_comida': current_time.replace(tzinfo=None)})
+            attendance.sudo().write({'hora_de_comida': naive_current_time})
             message = 'Su hora de comida ha sido registrada.'
         
         # Si la hora de regreso de comida no ha sido registrada, la registramos
         elif not attendance.regreso_de_comida:
             # Usar la hora exacta en la zona horaria de México para registrar la hora de regreso de comida
-            attendance.sudo().write({'regreso_de_comida': current_time.replace(tzinfo=None)})
+            attendance.sudo().write({'regreso_de_comida': naive_current_time})
             message = 'Su hora de regreso de comida ha sido registrada.'
         
         # Si ambos ya están registrados
@@ -57,6 +60,6 @@ class LunchTime(http.Controller):
 
         return request.render('lunch_time.confirmation_page', {
             'employee_name': employee.name,
-            'current_time': current_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'current_time': naive_current_time.strftime('%Y-%m-%d %H:%M:%S'),
             'message': message
         })
