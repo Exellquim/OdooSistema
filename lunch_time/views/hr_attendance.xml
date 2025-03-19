@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <!-- Insertar los nuevos campos después del campo check_in -->
                 <xpath expr="//field[@name='check_in']" position="after">
+                    <field name="registro"/>
                     <field name="hora_de_comida"/>
                     <field name="regreso_de_comida"/>
                 </xpath>
