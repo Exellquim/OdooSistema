@@ -8,8 +8,7 @@
         <button name="action_open_product_select_wizard"
                 type="object"
                 string="Seleccionar Productos"
-                class="btn-secondary"
-                attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
+                class="btn-secondary"/>
       </xpath>
     </field>
   </record>
