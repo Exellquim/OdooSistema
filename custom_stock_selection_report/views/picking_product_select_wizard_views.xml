@@ -1,0 +1,21 @@
+<odoo>
+  <record id="view_picking_product_select_wizard_form" model="ir.ui.view">
+    <field name="name">picking.product.select.wizard.form</field>
+    <field name="model">picking.product.select.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Seleccionar Productos">
+        <group>
+          <field name="picking_id" readonly="1"/>
+          <field name="product_ids" widget="many2many_tags"/>
+        </group>
+        <footer>
+          <button string="Imprimir Reporte"
+                  type="object"
+                  name="action_print_selected_products"
+                  class="btn-primary"/>
+          <button string="Cancelar" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>

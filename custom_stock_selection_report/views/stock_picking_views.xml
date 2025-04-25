@@ -1,0 +1,16 @@
+<odoo>
+  <record id="view_picking_form_inherit_product_button" model="ir.ui.view">
+    <field name="name">stock.picking.form.inherit.product.button</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='button_validate']" position="after">
+        <button name="action_open_product_select_wizard"
+                type="object"
+                string="Seleccionar Productos"
+                class="btn-secondary"
+                attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
