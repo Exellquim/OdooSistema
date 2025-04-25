@@ -6,7 +6,7 @@
       <form string="Seleccionar Productos">
         <group>
           <field name="picking_id" readonly="1"/>
-          <field name="product_ids" widget="many2many_tags"/>
+          <field name="product_ids" />
         </group>
         <footer>
           <button string="Imprimir Reporte"
