@@ -18,4 +18,29 @@
       </form>
     </field>
   </record>
+  
+    <report
+    id="action_report_selected_products"
+    model="picking.product.select.wizard"
+    string="Reporte Productos Seleccionados"
+    name="custom_stock_selection_report.report_selected_products_template"
+    report_type="qweb-pdf"
+    file="custom_stock_selection_report.report_selected_products_template"
+    print_report_name="'Productos Seleccionados'"
+  />
+
+  <template id="report_selected_products_template">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <h2 class="text-center">Productos Seleccionados</h2>
+        <ul>
+          <t t-foreach="doc.product_ids" t-as="prod">
+            <li>
+              <t t-esc="prod.display_name"/>
+            </li>
+          </t>
+        </ul>
+      </t>
+    </t>
+  </template>
 </odoo>
