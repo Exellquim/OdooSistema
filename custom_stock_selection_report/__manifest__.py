@@ -9,7 +9,7 @@
         'views/stock_picking_views.xml',
         'views/picking_product_select_wizard_views.xml',
         #'reports/report.xml',
-        'reports/product_selected_template.xml',
+        #'reports/product_selected_template.xml',
     ],
     'installable': True,
     'application': False,
