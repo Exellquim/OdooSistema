@@ -17,18 +17,4 @@ class PickingProductSelectWizard(models.TransientModel):
 
     def action_print_selected_products(self):
         self.ensure_one()
-
-        selected_products = []
-        for product in self.product_ids:
-            selected_products.append({
-                'name': product.display_name,
-            })
-
-        data = {
-            'products': selected_products,
-            'picking_name': self.picking_id.name,
-        }
-
-        return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self, data=data)
-
-
+        return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self)
