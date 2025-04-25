@@ -31,17 +31,18 @@
 <template id="report_selected_products_template">
   <t t-call="web.html_container">
     <t t-call="web.external_layout">
-      <h2 class="text-center">Productos Seleccionados</h2>
+      <h2 class="text-center">Productos Seleccionados del Picking: <t t-esc="data.get('picking_name')"/></h2>
       <ul>
-        <t t-foreach="doc.product_ids" t-as="prod">
+        <t t-foreach="data.get('products', [])" t-as="prod">
           <li>
-            <t t-esc="prod.display_name"/>
+            <t t-esc="prod.get('name')"/>
           </li>
         </t>
       </ul>
     </t>
   </t>
 </template>
+
 
 
 </odoo>
