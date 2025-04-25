@@ -18,16 +18,16 @@
       </form>
     </field>
   </record>
-  
-    <report
-    id="action_report_selected_products"
-    model="picking.product.select.wizard"
-    string="Reporte Productos Seleccionados"
-    name="custom_stock_selection_report.report_selected_products_template"
-    report_type="qweb-pdf"
-    file="custom_stock_selection_report.report_selected_products_template"
-    print_report_name="'Productos Seleccionados'"
-  />
+
+    <record id="action_report_selected_products" model="ir.actions.report">
+        <field name="name">Reporte</field>
+        <field name="model">picking.product.select.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_stock_selection_report.report_selected_products_template</field>
+        <field name="report_file">custom_stock_selection_report.report_selected_products_template</field>
+        <field name="print_report_name">'Productos Seleccionados'</field>
+    </record>
+
 
   <template id="report_selected_products_template">
     <t t-call="web.html_container">
