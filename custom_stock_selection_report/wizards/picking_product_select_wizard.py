@@ -16,4 +16,5 @@ class PickingProductSelectWizard(models.TransientModel):
         return res
 
     def action_print_selected_products(self):
-        return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self)
+        return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self.id)
+
