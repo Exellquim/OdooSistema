@@ -74,13 +74,12 @@
                 <t t-esc="move_line.x_proveedor_entrega or ''"/>
               </td>
             </tr>
-
           </tbody>
         </table>
       </div>
-    </t>
-</template>
-
+    </t> <!-- Cierre del foreach -->
+  </t> <!-- Cierre del t-call -->
+</template> <!-- Cierre del template -->
 
 
 
