@@ -30,21 +30,57 @@
 
 <template id="report_selected_products_template">
   <t t-call="web.html_container">
-    <t t-call="web.external_layout">
-      <h2 class="text-center">
-        Productos Seleccionados del Picking: 
-        <t t-esc="docs.picking_id.name"/>
-      </h2>
-      <ul>
-        <t t-foreach="docs.product_ids" t-as="prod">
-          <li>
-            <t t-esc="prod.display_name"/>
-          </li>
-        </t>
-      </ul>
+    <t t-foreach="docs.product_ids" t-as="prod">
+      <t t-set="move_line" t-value="docs.picking_id.move_ids_without_package.filtered(lambda l: l.product_id.id == prod.id).sorted('id')[0]"/>
+      <div class="page">
+        <table style="width: 100%; font-size: 14px; border: 1px solid black; border-collapse: collapse;">
+          <tbody>
+            <!-- Primera fila de títulos -->
+            <tr>
+              <td style="border: 1px solid black; text-align: center;">Clave 3B Proveedor</td>
+              <td style="border: 1px solid black; text-align: center;">Nombre Proveedor</td>
+              <td style="border: 1px solid black; text-align: center;">Nombre CEDIS 3B</td>
+            </tr>
+
+            <!-- Primera fila de datos -->
+            <tr>
+              <td style="border: 1px solid black; text-align: center;">586</td>
+              <td style="border: 1px solid black; text-align: center;">EXELLQUIM S.A. DE C.V.</td>
+              <td style="border: 1px solid black; text-align: center;">
+                <t t-esc="docs.picking_id.partner_id.name"/>
+              </td>
+            </tr>
+
+            <!-- Segunda fila de títulos -->
+            <tr>
+              <td style="border: 1px solid black; text-align: center;">Clave SKU 3B</td>
+              <td style="border: 1px solid black; text-align: center;">Descripción SKU 3B</td>
+              <td style="border: 1px solid black; text-align: center;">Orden Compra Nº</td>
+              <td style="border: 1px solid black; text-align: center;">Lote Nº</td>
+            </tr>
+
+            <!-- Segunda fila de datos -->
+            <tr>
+              <td style="border: 1px solid black; text-align: center;">
+                <!-- Clave SKU 3B: de momento la dejamos vacía o la podemos completar después -->
+              </td>
+              <td style="border: 1px solid black; text-align: center;">
+                <t t-esc="prod.display_name"/>
+              </td>
+              <td style="border: 1px solid black; text-align: center;">
+                <t t-esc="docs.picking_id.origin or ''"/>
+              </td>
+              <td style="border: 1px solid black; text-align: center;">
+                <t t-esc="move_line.x_proveedor_entrega or ''"/>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
     </t>
-  </t>
 </template>
+
 
 
 
