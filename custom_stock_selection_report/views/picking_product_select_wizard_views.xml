@@ -71,7 +71,7 @@
                 <t t-esc="docs.picking_id.origin or ''"/>
               </td>
               <td style="border: 1px solid black; text-align: center;">
-                <t t-esc="move_line.x_proveedor_entrega or ''"/>
+               <!--<t t-esc="move_line.x_proveedor_entrega or ''"/>-->
               </td>
             </tr>
           </tbody>
