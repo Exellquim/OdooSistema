@@ -243,7 +243,7 @@
             <h3 style="text-transform: uppercase;">HOJA IDENTIFICATIVA ESTIBA 3B DIN A4</h3>
             <br/>
             <h5 style="text-transform: uppercase;">COLOCAR EN LOS 4 LADOS DE LA ESTIBA PARA FÁCIL IDENTIFICACIÓN</h5>
-      <img t-att-src="'/custom_stock_selection_report/static/src/img/3B_Logo.jpg'"
+      <img t-att-src="'/custom_stock_selection_report/static/src/3B_Logo.jpg'"
        style="position: absolute; top: -10px; right: 0; width: 80px; height: 50px; object-fit: contain;"/>
         </div>
       </div>
