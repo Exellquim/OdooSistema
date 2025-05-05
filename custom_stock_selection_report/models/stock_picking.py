@@ -12,3 +12,9 @@ class StockPicking(models.Model):
             'target': 'new',
             'context': {'default_picking_id': self.id},
         }
+    
+    def button_actualizar(self):
+        for move in self.move_ids_without_package:
+            move.quantity_done = 0.0  # Este es el campo correcto para modificar la cantidad realizada
+        return True
+
