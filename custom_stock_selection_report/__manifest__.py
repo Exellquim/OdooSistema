@@ -1,7 +1,7 @@
 {
     'name': 'Stock Picking Product Selection Report',
     'version': '1.0',
-    'depends': ['stock'],
+    'depends': ['stock', 'purchase'],
     'category': 'Inventory',
     'summary': 'Permite seleccionar productos del picking y generar un reporte',
     'data': [
