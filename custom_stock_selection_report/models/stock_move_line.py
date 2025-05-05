@@ -38,7 +38,7 @@ class PurchaseOrderLine(models.Model):
             'product_uom': product_uom.id,
             'product_packaging_id': self.product_packaging_id.id,
             'sequence': self.sequence,
-            'quantity_done': 0.0,  # <-- Agregado aquí
+            'quantity': 0.0,  # <-- Agregado aquí
         }
 
         return vals
