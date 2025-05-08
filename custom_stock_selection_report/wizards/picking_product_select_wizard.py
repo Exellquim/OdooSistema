@@ -25,12 +25,10 @@ class PickingProductSelectWizard(models.TransientModel):
     def action_print_selected_products(self):
         self.ensure_one()
         return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self)
-
+        
 class PickingProductQty(models.Model):
     _name = 'picking.product.qty'
     _description = 'Cantidad de producto en picking'
 
-    wizard_id = fields.Many2one('picking.product.select.wizard', string='Wizard')
     product_id = fields.Many2one('product.product', string='Producto', required=True)
     product_qty = fields.Float(string='Cantidad', required=True)
-
