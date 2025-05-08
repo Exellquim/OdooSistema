@@ -18,3 +18,7 @@ class PickingProductSelectWizard(models.TransientModel):
     def action_print_selected_products(self):
         self.ensure_one()
         return self.env.ref('custom_stock_selection_report.action_report_selected_products').report_action(self)
+        
+    def action_print_residuo(self):
+        self.ensure_one()
+        return self.env.ref('custom_stock_selection_report.action_report_residuo').report_action(self)
