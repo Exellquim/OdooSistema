@@ -29,5 +29,5 @@
                 <field name="unidades_sku_x_pallet" attrs="{'invisible': [('state', '!=', 'draft')]}" />
             </xpath>
         </field>
-  
+  </record>
 </odoo>
