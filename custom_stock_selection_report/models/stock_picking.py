@@ -17,3 +17,11 @@ class StockPicking(models.Model):
             move.quantity = 0.0  # Este es el campo correcto para modificar la cantidad realizada
         return True
 
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    camas_x_pallet = fields.Float(string="Camas por Pallet", help="Número de camas por pallet")
+    cajas_x_pallet = fields.Float(string="Cajas por Pallet", help="Número de cajas por pallet")
+    unidades_sku_x_pallet = fields.Float(string="Unidades SKU por Pallet", help="Número de unidades SKU por pallet")
+
+
