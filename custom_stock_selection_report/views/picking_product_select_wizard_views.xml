@@ -6,18 +6,21 @@
       <form string="Seleccionar Productos">
         <group>
           <field name="picking_id" readonly="1"/>
-          <field name="product_ids" />
+          <field name="product_qty_ids">
+            <tree>
+              <field name="product_id"/>  <!-- Producto -->
+              <field name="product_qty"/>  <!-- Cantidad asociada al producto -->
+            </tree>
+          </field>
         </group>
         <footer>
-          <button string="Imprimir Reporte"
-                  type="object"
-                  name="action_print_selected_products"
-                  class="btn-primary"/>
+          <button string="Imprimir Reporte" type="object" name="action_print_selected_products" class="btn-primary"/>
           <button string="Cancelar" class="btn-secondary" special="cancel"/>
         </footer>
       </form>
     </field>
   </record>
+
 
     <record id="action_report_selected_products" model="ir.actions.report">
         <field name="name">Reporte</field>
