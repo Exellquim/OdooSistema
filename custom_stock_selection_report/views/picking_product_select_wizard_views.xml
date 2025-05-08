@@ -30,6 +30,15 @@
         <field name="print_report_name">'Productos Seleccionados'</field>
     </record>
 
+      <record id="action_report_residuo" model="ir.actions.report">
+        <field name="name">Reporte</field>
+        <field name="model">picking.product.select.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_stock_selection_report.report_selected_residuo</field>
+        <field name="report_file">custom_stock_selection_report.report_selected_residuo</field>
+        <field name="print_report_name">'Productos Residuos'</field>
+    </record>
+
 <template id="report_selected_products_template">
 <t t-call="web.basic_layout">
     <t t-foreach="docs.product_ids" t-as="prod">
@@ -253,6 +262,245 @@
     </t>
   </t>
 </template> <!-- Cierre del template -->
+
+
+
+
+
+
+
+
+
+
+
+
+  <template id="report_selected_residuo">
+<t t-call="web.basic_layout">
+    <t t-foreach="docs.product_ids" t-as="prod">
+      <t t-set="move_line" t-value="docs.picking_id.move_ids_without_package.filtered(lambda l: l.product_id.id == prod.id).sorted('id')[0] if docs.picking_id.move_ids_without_package.filtered(lambda l: l.product_id.id == prod.id) else False"/>
+      <t t-if="move_line">
+        <t t-set="real_move_line" t-value="move_line.move_line_ids and move_line.move_line_ids[0]"/>
+
+        <div class="page" style="margin: 0 auto; padding: 0; margin-bottom: 50px; page-break-after: always; max-width: 95%;">
+          <table style="width: 100%; height: 100%; font-size: 32px; border-collapse: separate; border: none; margin-left: auto; margin-right: auto; border-collapse: separate; border-spacing: 6px;">
+            <colgroup>
+              <col style="width: 25%;"/>
+              <col style="width: 25%;"/>
+              <col style="width: 25%;"/>
+              <col style="width: 25%;"/>
+            </colgroup>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-size: 30px; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">Clave 3B Proveedor</td>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-size: 35px; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">Nombre Proveedor</td>
+                <td colspan="2" style="border: 1px solid black; text-align: left; vertical-align: middle; font-size: 35px; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">Nombre CEDIS 3B</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">586</td>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-weight: bold; height: 60px;font-size: 30px; border-collapse: separate; border-spacing: 4px; ">EXELLQUIM S.A. DE C.V.</td>
+                <td colspan="2" style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="docs.picking_id.partner_id.name"/>
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-weight: bold; height: 60px; border-collapse: separate; border-spacing: 4px; ">Clave SKU 3B</td>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-weight: bold; height: 60px;border-collapse: separate; border-spacing: 4px; ">Descripción SKU 3B</td>
+<td colspan="2" style="border: 1px solid black; text-align: center; font-weight: bold; position: relative; font-size: 20px; height: 60px; vertical-align: middle;">
+  <!-- Columna izquierda con borde derecho completo -->
+  <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 50%; border-right: 1px solid black; display: flex; align-items: start; justify-content: center; font-size: 20px; padding-top: 20px;">
+    ORDEN DE COMPRA Nº
+  </div>
+
+  <!-- Columna derecha -->
+  <div style="position: absolute; top: 0; bottom: 0; right: 0; width: 50%; display: flex; align-items: start; justify-content: center; font-size: 20px; padding-top: 20px;">
+    LOTE Nº
+  </div>
+</td>
+
+
+
+
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; height: 90px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_clave_sku or ''"/>
+                </td>
+                <td style="border: 1px solid black; text-align: left; vertical-align: middle; font-weight: bold; font-size: 20px; height: 90px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.display_name"/>
+                </td>
+<td colspan="2" style="border: 1px solid black; text-align: center; font-weight: bold; position: relative; font-size: 20px; height: 90px; vertical-align: middle;">
+  <!-- Columna izquierda con borde derecho -->
+  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 50%; border-right: 1px solid black; display: flex; align-items: center; justify-content: center;  padding-top: 30px;">
+    <t t-esc="docs.picking_id.x_studio_odc or ''"/>
+  </div>
+
+  <!-- Columna derecha -->
+  <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 50%; display: flex; align-items: center; justify-content: center;padding-top: 30px;">
+    <t t-if="real_move_line and real_move_line.lot_id and real_move_line.lot_id.name">
+      <t t-set="lot_name" t-value="real_move_line.lot_id.name"/>
+      <t t-set="lote_extraido" t-value="'M' + lot_name.split('M')[1].split('/')[0] if 'M' in lot_name else ''"/>
+      <span t-esc="lote_extraido or 'LOTE NO FORMATEADO'"/>
+    </t>
+  </div>
+</td>
+
+
+              </tr>
+              <tr>
+                <td colspan="2" style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; height: 200px; border-collapse: separate; border-spacing: 4px; ">
+  <div style="margin: 10px auto; width: 600px; height: auto; display: flex; flex-direction: column; align-items: center;">
+    
+    <!-- Código de barras -->
+    <div t-field="prod.barcode" t-options="{'widget': 'barcode', 'barcode_type': 'Code128', 'width': 600, 'height': 120}" style="width: 600px; height: 120px;"/>
+
+    <!-- Número debajo -->
+    <span t-esc="prod.barcode" style="margin-top: 8px; font-size: 24px;"/>
+  </div>
+</td>
+                <td style="border: 1px solid black; vertical-align: middle; border-collapse: separate; border-spacing: 4px; ">
+                  <table style="width: 100%; height: 100%;">
+                    <tbody>
+                      <tr>
+                        <td style="border-bottom: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px;  height: 30px;">
+                          CADUCIDAD<br/>AÑO/MES/DÍA
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="border-bottom: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px; border-collapse: separate; border-spacing: 4px; height: 30px; ">
+<t t-if="real_move_line and real_move_line.lot_id">
+  <t t-set="lot_name" t-value="real_move_line.lot_id.name"/>
+
+  <t t-if="'C' in lot_name and '/' in lot_name">
+    <t t-set="fecha_raw" t-value="lot_name.split('/')[-1].replace('C','')"/>
+    <span t-esc=" 'C'+ fecha_raw[4:6] + '/' + fecha_raw[2:4] + '/' + fecha_raw[0:2]"/>
+  </t>
+
+  <t t-if="not ('C' in lot_name and '/' in lot_name)">
+    <span>FECHA NO FORMATEADA</span>
+  </t>
+</t>
+
+                        </td>
+                      </tr>
+                      <tr>
+<td style="border: 1px solid black; border-bottom: none; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px; border-collapse: separate; border-spacing: 4px; ">
+  ESTIBABLE
+  <br/>
+  <span style="margin: 0 10px;">SI</span>
+  <span style="margin: 0 10px;">NO</span>
+</td>
+
+                      </tr>
+                      <tr>
+<td style="border: 1px solid black; border-bottom: none; text-align: center; vertical-align: middle; font-weight: bold; font-size: 17px; border-collapse: separate; border-spacing: 4px; ">
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <!-- Recuadro izquierdo vacío -->
+      <td style="width: 50%; vertical-align: middle;">
+        <div style="width: 50px; height: 50px; border: 1px solid black; margin: auto;"/>
+      </td>
+      <!-- Recuadro derecho con tache -->
+      <td style="width: 50%; vertical-align: middle;">
+<div style="   width: 50px;   height: 50px;   margin: auto;   border: 1px solid black;   text-align: center;   font-size: 32px;   color: black;   line-height: 50px; ">
+  X
+</div>
+
+
+      </td>
+    </tr>
+  </table>
+</td>
+
+
+
+
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td style="border: 1px solid black; vertical-align: middle; border-collapse: separate; border-spacing: 4px; ">
+                  <table style="width: 100%; height: 100%; ">
+                    <tbody>
+                      <tr>
+                        <td style="border-bottom: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px; height: 30px;">
+                          PESO KG PALLET<br/>(Incl. MADERA)
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="border-bottom: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px; height: 30px;">
+                          <t t-esc="prod.x_studio_peso"/>kg
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="border-bottom: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px; height: 65px;">
+                          FECHA DE ENTREGA<br/>AÑO/MES/DÍA
+                        </td>
+                      </tr>
+                      <tr>
+<td style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 20px;">
+  <t t-if="docs.picking_id.x_studio_fecha_y_hora_de_entrega">
+    <t t-set="fecha" t-value="docs.picking_id.x_studio_fecha_y_hora_de_entrega.strftime('%Y/%m/%d')"/>
+  </t>
+  <t t-elif="docs.picking_id.x_studio_fecha_de_entrega">
+    <t t-set="fecha" t-value="docs.picking_id.x_studio_fecha_de_entrega.strftime('%Y/%m/%d')"/>
+  </t>
+  <t t-if="fecha">
+    <t t-esc="fecha"/>
+  </t>
+</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table style="width: 100%; height: 100%; font-size: 32px; border: none;  margin-left: auto; margin-right: auto; border-collapse: separate; border-spacing: 6px;">
+            <tbody>
+              <tr>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 22px; height: 80px; border-collapse: separate; border-spacing: 4px; ">UNIDADES X CAJA</td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 22px; height: 80px; border-collapse: separate; border-spacing: 4px; ">CAJAS X CAMA</td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 22px; height: 80px; border-collapse: separate; border-spacing: 4px; ">CAMAS X PALLET</td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 22px; height: 80px; border-collapse: separate; border-spacing: 4px; ">CAJAS X PALLET</td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-weight: bold; font-size: 22px; height: 80px; border-collapse: separate; border-spacing: 4px; ">UNIDADES SKU X PALLET</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-size: 22px; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_unidades_x_caja"/>
+                </td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-size: 22px; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_cajas_x_cama"/>
+                </td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-size: 22px; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_camas_x_pallet"/>
+                </td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-size: 22px; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_cajas_x_pallet"/>
+                </td>
+                <td style="border: 1px solid black; text-align: center; vertical-align: middle; font-size: 22px; height: 60px; border-collapse: separate; border-spacing: 4px; ">
+                  <t t-esc="prod.x_studio_unidades_sku_x_pallet"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        <div style="text-align: center; margin-top: 20px; position: relative;">
+            <h3 style="text-transform: uppercase;">HOJA IDENTIFICATIVA ESTIBA 3B DIN A4</h3>
+            <br/>
+            <h5 style="text-transform: uppercase;">COLOCAR EN LOS 4 LADOS DE LA ESTIBA PARA FÁCIL IDENTIFICACIÓN</h5>
+      <img t-att-src="'/custom_stock_selection_report/static/src/3B_Logo.jpg'"
+       style="position: absolute; top: -10px; right: 0; width: 120px; height: 70px; object-fit: contain;"/>
+        </div>
+      </div>
+      </t>
+    </t>
+  </t>
+</template> <!-- Cierre del template -->
+
+
+
+</odoo>
 
 
 
