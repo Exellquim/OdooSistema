@@ -42,7 +42,7 @@ class StockMove(models.Model):
         for move in self:
             unidades_x_pallet = move.product_id.x_studio_unidades_sku_x_pallet or 1.0
             cajas_por_pallet = move.product_id.x_studio_cajas_x_pallet or 1.0
-            unidades_por_caja = move.x_studio_unidades_x_caja or 1.0
+            unidades_por_caja = move.product_id.x_studio_unidades_x_caja or 1.0
 
             # ----------------------------
             # Cálculo UNIDADES SKU X PALLET
