@@ -12,4 +12,12 @@ class HrAttendance(models.Model):
         for record in self:
             record.registro = record.check_in.date() if record.check_in else False
 
+class AccountAccount(models.Model):
+    _inherit = 'account.account'
+
+    account_type = fields.Selection(
+        selection_add=[('resultado', 'Resultado')]
+    )
+
+
 
