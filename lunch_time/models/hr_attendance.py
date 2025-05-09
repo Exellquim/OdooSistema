@@ -16,8 +16,8 @@ class AccountAccount(models.Model):
     _inherit = 'account.account'
 
     account_type = fields.Selection(
-        selection_add=[('resultado', 'Resultado')]
+        selection_add=[('resultado', 'Resultado')],
+        ondelete={'resultado': 'set default'}
     )
-
 
 
