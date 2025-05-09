@@ -17,7 +17,6 @@ class AccountAccount(models.Model):
 
     account_type = fields.Selection(
         selection_add=[('resultado', 'Resultado')],
-        ondelete={'resultado': 'set default'}
     )
 
 
