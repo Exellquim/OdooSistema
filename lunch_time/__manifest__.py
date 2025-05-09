@@ -9,7 +9,8 @@
     'depends': [
         'base',               
         'hr_attendance',        
-        'website'            
+        'website',
+        'account'
     ],
     'data': [
          'views/hr_attendance_views.xml',
