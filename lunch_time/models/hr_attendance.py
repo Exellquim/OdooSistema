@@ -17,6 +17,8 @@ class AccountAccount(models.Model):
 
     account_type = fields.Selection(
         selection_add=[('resultado', 'Resultado')],
+        ondelete={'resultado': 'cascade'}  # Elimina registros con esta opción al desinstalar
     )
+
 
 
