@@ -12,6 +12,15 @@ class HrAttendance(models.Model):
         for record in self:
             record.registro = record.check_in.date() if record.check_in else False
 
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    def _prepare_stock_moves(self, picking):
+        res = super()._prepare_stock_moves(picking)
+        for move_vals in res:
+            move_vals['product_uom_qty'] = 0.0  # Forzar a 0 la cantidad solicitada en la recepción
+        return res
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
