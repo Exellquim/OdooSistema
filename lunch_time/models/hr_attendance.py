@@ -25,6 +25,15 @@ class StockMove(models.Model):
 
         return True
 
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    def _prepare_stock_moves(self, picking):
+        res = super()._prepare_stock_moves(picking)
+        for move_vals in res:
+            move_vals['quantity'] = 0.0  # Forzar la cantidad a 0 antes de crear el movimiento
+        return res
+
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'
