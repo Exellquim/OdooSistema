@@ -10,7 +10,8 @@
         'base',               
         'hr_attendance',        
         'website',
-        'account'
+        'account',
+        'stock'
     ],
     'data': [
          'views/hr_attendance_views.xml',
