@@ -12,6 +12,20 @@ class HrAttendance(models.Model):
         for record in self:
             record.registro = record.check_in.date() if record.check_in else False
 
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('picking_type_id'):  # Solo afecta a movimientos de recepción
+                vals['quantity'] = 0.0
+        return super().create(vals_list)
+
+        return True
+
+
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
