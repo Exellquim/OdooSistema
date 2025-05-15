@@ -11,7 +11,8 @@
         'hr_attendance',        
         'website',
         'account',
-        'stock'
+        'stock',
+        'purchase'
     ],
     'data': [
          'views/hr_attendance_views.xml',
