@@ -52,5 +52,11 @@ class AccountAccount(models.Model):
         ondelete={'resultado': 'cascade'}  # Elimina registros con esta opción al desinstalar
     )
 
+class StockMoveLine(models.Model):
+    _inherit = 'stock.move.line'
 
-
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals['qty_done'] = 0.0  # Forzar la cantidad a procesar a 0 en cada línea de picking
+        return super().create(vals_list)
