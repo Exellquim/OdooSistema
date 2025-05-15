@@ -12,37 +12,6 @@ class HrAttendance(models.Model):
         for record in self:
             record.registro = record.check_in.date() if record.check_in else False
 
-class PurchaseOrderLine(models.Model):
-    _inherit = 'purchase.order.line'
-
-    def _prepare_stock_moves(self, picking):
-        res = super()._prepare_stock_moves(picking)
-        for move_vals in res:
-            move_vals['product_uom_qty'] = 0.0  # Forzar a 0 la cantidad solicitada en la recepción
-        return res
-
-
-class StockMove(models.Model):
-    _inherit = 'stock.move'
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if vals.get('picking_type_id'):  # Solo afecta a movimientos de recepción
-                vals['quantity'] = 0.0
-        return super().create(vals_list)
-
-        return True
-
-class PurchaseOrderLine(models.Model):
-    _inherit = 'purchase.order.line'
-
-    def _prepare_stock_moves(self, picking):
-        res = super()._prepare_stock_moves(picking)
-        for move_vals in res:
-            move_vals['quantity'] = 0.0  # Forzar la cantidad a 0 antes de crear el movimiento
-        return res
-
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'
@@ -58,5 +27,7 @@ class StockMoveLine(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            vals['qty_done'] = 0.0  # Forzar la cantidad a procesar a 0 en cada línea de picking
+            # Solo forzar qty_done en la creación inicial, no en pasos posteriores como validaciones
+            if not vals.get('qty_done'):
+                vals['qty_done'] = 0.0
         return super().create(vals_list)
