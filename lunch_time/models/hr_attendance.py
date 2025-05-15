@@ -23,11 +23,11 @@ class AccountAccount(models.Model):
 
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
-
+    
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            # Solo forzar qty_done en la creación inicial, no en pasos posteriores como validaciones
-            if not vals.get('qty_done'):
+            # Solo forzar a 0 si se está creando desde la recepción inicial y no se ha capturado cantidad
+            if self.env.context.get('default_picking_id') and not vals.get('qty_done'):
                 vals['qty_done'] = 0.0
         return super().create(vals_list)
