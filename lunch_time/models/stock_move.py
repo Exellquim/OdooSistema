@@ -14,6 +14,6 @@ class StockPicking(models.Model):
             for move in picking.move_ids_without_package:
                 if move.cantidad <= 0:
                     raise ValidationError(f"La línea del producto '{move.product_id.display_name}' tiene cantidad en cero. No se puede validar.")
-                move.quantity_done = move.cantidad  # copiar el valor a quantity_done
+                move.quantity = move.cantidad  # copiar el valor a quantity_done
 
         return super().button_validate()
