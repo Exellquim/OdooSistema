@@ -13,9 +13,15 @@ class StockMove(models.Model):
         store=True
     )
 
-    @api.depends('cantidad')
-    def _compute_x_studio_fields(self):
-        for record in self:
-            # Asegura que siempre se asignen los valores computados
-            record.nuevo = ''
-            record.quantity = record.cantidad or 0.0
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.depends('move_ids.cantidad')
+    def _compute_move_quantities(self):
+        for picking in self:
+            for move in picking.move_ids:
+                move.nuevo = ''
+                if move.state not in ('done', 'cancel'):
+                    move.quantity = move.cantidad or 0.0
+
