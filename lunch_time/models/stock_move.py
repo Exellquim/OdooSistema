@@ -12,9 +12,13 @@ class StockMove(models.Model):
         default=0.0
     )
 
-    @api.depends('cantidad')
-    def _compute_quantity(self):
+    @api.onchange('cantidad')
+    def _onchange_cantidad(self):
         for record in self:
-            if record.state not in ('done', 'cancel'):
-                record.quantity = record.cantidad
+            if record.product_id.tracking in ['lot', 'serial'] and not record.lot_id:
+                # Si el producto requiere lote y aún no se capturó, no asignar
+                record.quantity = 0.0
+            else:
+                record.quantity = record.cantidad or 0.0
+
 
