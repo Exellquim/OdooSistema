@@ -12,10 +12,9 @@ class StockMove(models.Model):
         default=0.0
     )
 
-
-    @api.onchange('cantidad')
-    def _onchange_cantidad(self):
+    @api.depends('cantidad')
+    def _compute_quantity(self):
         for record in self:
-            record.quantity = record.cantidad
-            record.nuevo = ''
+            if record.state not in ('done', 'cancel'):
+                record.quantity = record.cantidad
 
