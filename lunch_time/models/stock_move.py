@@ -16,7 +16,7 @@ class StockMove(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    @api.depends('move_ids.cantidad')
+    @api.onchange('move_ids.cantidad')
     def _compute_move_quantities(self):
         for picking in self:
             for move in picking.move_ids:
