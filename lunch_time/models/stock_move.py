@@ -8,7 +8,7 @@ class StockMove(models.Model):
         store=True
     )
     cantidad = fields.Float(
-        store=True
+        store=True,
         default=0.0
     )
 
