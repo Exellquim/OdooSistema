@@ -16,7 +16,6 @@ class StockMove(models.Model):
     @api.onchange('cantidad')
     def _onchange_cantidad(self):
         for record in self:
-            if record.state not in ('done', 'cancel'):
-                record.quantity = record.cantidad
-                record.nuevo = ''
+            record.quantity = record.cantidad
+            record.nuevo = ''
 
