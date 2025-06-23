@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -6,22 +7,15 @@ class StockMove(models.Model):
     nuevo = fields.Char(string='Campo Nuevo', store=True)
     cantidad = fields.Float(store=True, default=0.0)
 
-    @api.onchange('cantidad')
-    def _onchange_cantidad(self):
-        for record in self:
-            tracking = record.product_id.tracking
-
-            # Filtrar línea con lote capturado
-            lot_line = record.move_line_ids.filtered(lambda l: l.lot_id)
-
-            if tracking in ['lot', 'serial']:
-                if lot_line:
-                    # Hay lote → actualizamos qty_done en la línea con lote
-                    lot_line[0].qty_done = record.cantidad
-                    record.quantity = record.cantidad
-                else:
-                    # Producto requiere lote pero no se ha capturado → bloquear
-                    record.quantity = 0.0
+    def asignar_cantidad_a_lote(self):
+        for move in self:
+            if move.product_id.tracking in ['lot', 'serial']:
+                lot_line = move.move_line_ids.filtered(lambda l: l.lot_id)
+                if not lot_line:
+                    raise ValidationError("Debes capturar primero un lote en operaciones detalladas.")
+                # Asigna la cantidad ingresada al lote
+                lot_line[0].qty_done = move.cantidad
+                move.quantity = move.cantidad
             else:
-                # Producto no requiere lote
-                record.quantity = record.cantidad
+                # Si el producto no tiene seguimiento, puedes asignar directamente
+                move.quantity = move.cantidad
