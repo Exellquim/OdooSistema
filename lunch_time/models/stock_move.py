@@ -13,14 +13,10 @@ class StockMove(models.Model):
     )
 
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    @api.onchange('move_ids.cantidad')
-    def _compute_move_quantities(self):
-        for picking in self:
-            for move in picking.move_ids:
-                move.nuevo = ''
-                if move.state not in ('done', 'cancel'):
-                    move.quantity = move.cantidad or 0.0
+    @api.onchange('cantidad')
+    def _onchange_cantidad(self):
+        for record in self:
+            if record.state not in ('done', 'cancel'):
+                record.quantity = record.cantidad
+                record.nuevo = ''
 
