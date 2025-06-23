@@ -17,7 +17,7 @@ class StockPicking(models.Model):
                         f"La línea del producto '{move.product_id.display_name}' tiene cantidad en cero. No se puede validar."
                     )
                 # Asignar la cantidad validada correctamente
-                move.quantity_done = move.cantidad
+                move.quantity = move.cantidad
 
         # Llamar al proceso estándar solo si todo está validado correctamente
         return super(StockPicking, self).button_validate()
