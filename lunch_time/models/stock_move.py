@@ -15,10 +15,11 @@ class StockMove(models.Model):
     @api.onchange('cantidad')
     def _onchange_cantidad(self):
         for record in self:
-            if record.product_id.tracking in ['lot', 'serial'] and not record.lot_ids:
-                # Si el producto requiere lote y aún no se capturó, no asignar
+            tracking = record.product_id.tracking
+            move_lines_with_lot = record.move_line_ids.filtered(lambda l: l.lot_id)
+
+            if tracking in ['lot', 'serial'] and not move_lines_with_lot:
+                # Producto requiere lote y no hay ninguno capturado
                 record.quantity = 0.0
             else:
                 record.quantity = record.cantidad or 0.0
-
-
