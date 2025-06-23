@@ -1,23 +1,21 @@
-from odoo import models, fields
-from odoo.exceptions import ValidationError
+from odoo import models, fields, api
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    cantidad = fields.Float(string="Cantidad para validar")
+    x_studio_nuevo = fields.Char(
+        string='Campo Nuevo',
+        compute='_compute_x_studio_fields',
+        store=True
+    )
+    quantity = fields.Float(
+        compute='_compute_x_studio_fields',
+        store=True
+    )
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    def button_validate(self):
-        for picking in self:
-            for move in picking.move_ids_without_package:
-                if move.cantidad <= 0:
-                    raise ValidationError(
-                        f"La línea del producto '{move.product_id.display_name}' tiene cantidad en cero. No se puede validar."
-                    )
-                # Asignar la cantidad validada correctamente
-                move.quantity = move.cantidad
-
-        # Llamar al proceso estándar solo si todo está validado correctamente
-        return super(StockPicking, self).button_validate()
+    @api.depends('x_studio_cantidad')
+    def _compute_x_studio_fields(self):
+        for record in self:
+            # Asegura que siempre se asignen los valores computados
+            record.x_studio_nuevo = ''
+            record.quantity = record.x_studio_cantidad or 0.0
