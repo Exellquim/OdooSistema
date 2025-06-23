@@ -18,4 +18,4 @@ class StockMove(models.Model):
         for record in self:
             # Asegura que siempre se asignen los valores computados
             record.nuevo = ''
-            record.quantity = record.x_studio_cantidad or 0.0
+            record.quantity = record.cantidad or 0.0
