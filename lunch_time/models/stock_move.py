@@ -5,12 +5,11 @@ class StockMove(models.Model):
 
     nuevo = fields.Char(
         string='Campo Nuevo',
-        compute='_compute_x_studio_fields',
         store=True
     )
     cantidad = fields.Float(
-        compute='_compute_x_studio_fields',
         store=True
+        default=0.0
     )
 
 
