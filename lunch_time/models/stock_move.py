@@ -4,24 +4,16 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     nuevo = fields.Char(string='Campo Nuevo', store=True)
-    cantidad = fields.Float(store=True, default=0.0)
+    cantidad = fields.Float(string='Cantidad Nueva', store=True, default=0.0)
 
     @api.onchange('cantidad')
     def _onchange_cantidad(self):
-        for record in self:
-            tracking = record.product_id.tracking
-            move_lines_with_lot = record.move_line_ids.filtered(lambda l: l.lot_id)
-
-            if tracking in ['lot', 'serial']:
-                if move_lines_with_lot:
-                    # Si hay lote, actualiza la línea y también el movimiento
-                    move_lines_with_lot[0].qty_done = record.cantidad
-                    record.quantity = record.cantidad
-                else:
-                    # Si no hay lote, bloquear cantidad
-                    record.quantity = 0.0
+        for move in self:
+            move.quantity = move.cantidad  # Actualiza campo de vista
+            move_lines = move.move_line_ids
+            if move_lines:
+                # Si ya hay una línea, solo actualizamos qty_done
+                move_lines[0].qty_done = move.cantidad
             else:
-                # Si no requiere lote, actualiza ambas cantidades
-                record.quantity = record.cantidad
-                for ml in record.move_line_ids:
-                    ml.qty_done = record.cantidad
+                # Si no hay línea aún, se crea en operaciones detalladas, no hacemos nada
+                pass
