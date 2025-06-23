@@ -1,2 +1,2 @@
 from . import hr_attendance
-#from . import stock_move
+from . import stock_move
