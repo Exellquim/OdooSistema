@@ -9,8 +9,9 @@ class StockReturnPicking(models.TransientModel):
     def _create_returns(self):
         res = super()._create_returns()
 
-        return_picking = self.env['stock.picking'].browse(res.get('res_id'))
-
+        new_picking_id, _ = res
+        return_picking = self.env['stock.picking'].browse(new_picking_id)
+        
         for move in return_picking.move_ids:
             original_move = move.origin_returned_move_id
             if not original_move:
