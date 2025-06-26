@@ -11,7 +11,7 @@ class StockReturnPicking(models.TransientModel):
 
         new_picking_id, _ = res
         return_picking = self.env['stock.picking'].browse(new_picking_id)
-        
+
         for move in return_picking.move_ids:
             original_move = move.origin_returned_move_id
             if not original_move:
@@ -21,23 +21,35 @@ class StockReturnPicking(models.TransientModel):
             if not purchase_line:
                 continue
 
-            # Restar del qty_received
+            # 1. Restar del qty_received
             purchase_line.qty_received -= move.product_uom_qty
             _logger.info(f"Devolución aplicada: -{move.product_uom_qty} en línea {purchase_line.id}")
 
-            # Buscar recepciones abiertas para aumentar su cantidad
+            # 2. Si no hay recepciones abiertas, forzar nueva creando por aumento temporal
             purchase_order = purchase_line.order_id
-            open_pickings = self.env['stock.picking'].search([
+            pickings = self.env['stock.picking'].search([
                 ('purchase_id', '=', purchase_order.id),
-                ('state', 'in', ['assigned', 'confirmed']),
-                ('id', '!=', original_move.picking_id.id)
+                ('state', 'in', ['assigned', 'confirmed', 'waiting']),
             ])
 
-            for picking in open_pickings:
-                for open_move in picking.move_ids:
-                    if open_move.product_id == move.product_id:
-                        open_move.product_uom_qty += move.product_uom_qty
-                        _logger.info(f"Aumentando recepción {picking.name}: +{move.product_uom_qty} en producto {move.product_id.name}")
+            # Validar si ya hay otra recepción abierta con el mismo producto
+            found = False
+            for picking in pickings:
+                for m in picking.move_ids:
+                    if m.product_id == move.product_id:
+                        found = True
                         break
+                if found:
+                    break
+
+            if not found:
+                # Aumentar cantidad temporalmente para que se genere recepción
+                original_qty = purchase_line.product_qty
+                purchase_line.product_qty += move.product_uom_qty
+                purchase_order.button_confirm()  # fuerza regenerar recepción
+                _logger.info(f"Generada nueva recepción por devolución de {move.product_id.name}")
+
+                # Restaurar a cantidad original
+                purchase_line.product_qty = original_qty
 
         return res
