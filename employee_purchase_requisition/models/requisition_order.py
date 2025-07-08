@@ -53,6 +53,11 @@ class RequisitionProducts(models.Model):
     partner_id = fields.Many2one(
         comodel_name='res.partner', string='Proveedor',
         help='Proveedor para la requisición',readonly=False)
+    approved_line = fields.Boolean(
+        string='Aprobado', help='Indica si la línea fue aprobada')
+
+    approved_quantity = fields.Integer(
+        string='Cantidad Aprobada', help='Cantidad autorizada para compra o transferencia')
 
     @api.depends('product_id')
     def _compute_name(self):
