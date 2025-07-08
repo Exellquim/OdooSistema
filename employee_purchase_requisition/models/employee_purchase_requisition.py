@@ -143,13 +143,15 @@ class PurchaseRequisition(models.Model):
 
     
     def copy(self, default=None):
-        """Al duplicar, genera un nuevo nombre y copia líneas."""
+        """Override para duplicar correctamente y generar nuevo número de referencia"""
         default = dict(default or {})
 
-        # Generar nuevo nombre usando el actual como base
-        default['name'] = f"{self.name or 'Requisición'} (Copia)"
+        # Asignar nuevo número de secuencia
+        default['name'] = self.env['ir.sequence'].next_by_code('employee.purchase.requisition') or _('Nuevo')
 
+        # Retornar duplicado completo (incluye líneas por defecto)
         return super(PurchaseRequisition, self).copy(default)
+
 
     def action_confirm_requisition(self):
         """Function to confirm purchase requisition"""
