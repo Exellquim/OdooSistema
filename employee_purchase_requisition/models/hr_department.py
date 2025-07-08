@@ -29,5 +29,5 @@ class Department(models.Model):
 
     department_location_id = fields.Many2one(
         comodel_name='stock.location',
-        string='Destination Location',
-        help='Select a department location from the list of locations.')
+        string='Ubicación Destino',
+        help='Seleccione la ubicación de un departamento de la lista de ubicaciones.')
