@@ -26,108 +26,110 @@ from odoo.exceptions import ValidationError
 class PurchaseRequisition(models.Model):
     """Class for adding fields and functions for purchase requisition model."""
     _name = 'employee.purchase.requisition'
-    _description = 'Employee Purchase Requisition'
+    _description = 'Solicitud de compra del empleado'
     _inherit = "mail.thread", "mail.activity.mixin"
 
     name = fields.Char(
-        string="Reference No", readonly=True)
+        string="Número de referencia", readonly=True)
+    origin = fields.Char(
+        string="Origen", readonly=True)
     employee_id = fields.Many2one(
-        comodel_name='hr.employee', string='Employee',
-        required=True, help='Select an employee')
+        comodel_name='hr.employee', string='Empleado',
+        required=True, help='Selecciona un empleado')
     dept_id = fields.Many2one(
-        comodel_name='hr.department', string='Department',
+        comodel_name='hr.department', string='Departmento',
         related='employee_id.department_id', store=True,
-        help='Select an department')
+        help='Selecciona un departamento')
     user_id = fields.Many2one(
         comodel_name='res.users',
-        string='Responsible',
+        string='Responsable',
         required=True,
         domain=lambda self: [('share', '=', False), ('id', '!=', self.env.uid)],
-        help='Select a user who is responsible for requisition')
+        help='Seleccione un usuario que sea responsable de la requisición.')
     requisition_date = fields.Date(
-        string="Requisition Date",
+        string="Fecha de requisición",
         default=lambda self: fields.Date.today(),
-        help='Date of requisition')
+        help='Fecha de requisición')
     receive_date = fields.Date(
-        string="Received Date", readonly=True,
-        help='Received date')
+        string="Fecha de recepción", readonly=True,
+        help='Fecha de recepción')
     requisition_deadline = fields.Date(
-        string="Requisition Deadline",
-        help="End date of purchase requisition")
+        string="Fecha límite de requisición",
+        help="Fecha de finalización de la requisición de compra")
     company_id = fields.Many2one(
         comodel_name='res.company', string='Company',
         default=lambda self: self.env.company,
-        help='Select a company')
+        help='Selecciona una empresa')
     requisition_order_ids = fields.One2many(
         comodel_name='requisition.order',
         inverse_name='requisition_product_id',
         required=True)
     confirm_id = fields.Many2one(
         comodel_name='res.users',
-        string='Confirmed By',
+        string='Confirmado por',
         default=lambda self: self.env.uid,
         readonly=True,
-        help='User who confirmed the requisition.')
+        help='El usuario que confirmó la requisición.')
     manager_id = fields.Many2one(
         comodel_name='res.users',
-        string='Department Manager',
-        readonly=True, help='Select a department manager')
+        string='Gerente de departamento',
+        readonly=True, help='Selecciona un gerente de departamento')
     requisition_head_id = fields.Many2one(
         comodel_name='res.users',
-        string='Approved By',
+        string='Aprobado por',
         readonly=True,
-        help='User who approved the requisition.')
+        help='Usuario que aprobó la requisición.')
     rejected_user_id = fields.Many2one(
         comodel_name='res.users',
-        string='Rejected By',
+        string='Rechazado por',
         readonly=True,
-        help='User who rejected the requisition')
+        help='Usuario que rechazó la requisición')
     confirmed_date = fields.Date(
-        string='Confirmed Date', readonly=True,
-        help='Date of requisition confirmation')
+        string='Fecha confirmada', readonly=True,
+        help='Fecha de confirmación de requisición')
     department_approval_date = fields.Date(
-        string='Department Approval Date',
+        string='Fecha de aprobación del departamento',
         readonly=True,
-        help='Department approval date')
+        help='Fecha de aprobación del departamento')
     approval_date = fields.Date(
-        string='Approved Date', readonly=True,
-        help='Requisition approval date')
+        string='Fecha de aprobación', readonly=True,
+        help='Fecha de aprobación de la solicitud')
     reject_date = fields.Date(
-        string='Rejection Date', readonly=True,
-        help='Requisition rejected date')
+        string='Fecha de rechazo', readonly=True,
+        help='Fecha de rechazo de la solicitud')
     source_location_id = fields.Many2one(
         comodel_name='stock.location',
-        string='Source Location',
-        help='Source location of requisition.')
+        string='Ubicación',
+        help='Ubicación de la solicitud.')
     destination_location_id = fields.Many2one(
         comodel_name='stock.location',
-        string="Destination Location",
-        help='Destination location of requisition.')
+        string="Ubicación Destino",
+        help='Ubicación de destino de la requisición.')
     delivery_type_id = fields.Many2one(
         comodel_name='stock.picking.type',
-        string='Delivery To',
-        help='Type of delivery.')
+        string='Entrega a',
+        help='Tipo de entrega.')
     internal_picking_id = fields.Many2one(
         comodel_name='stock.picking.type',
-        string="Internal Picking")
+        string="Picking Interno")
     requisition_description = fields.Text(
-        string="Reason For Requisition")
+        string="Razón de la requisición")
     purchase_count = fields.Integer(
         string='Purchase Count',
-        help='Purchase count',
+        help='Cantidad de compras',
         compute='_compute_purchase_count')
     internal_transfer_count = fields.Integer(
-        string='Internal Transfer count',
-        help='Internal transfer count',
+        string='Contador de transferencias internas',
+        help='Contador de transferencias internas',
         compute='_compute_internal_transfer_count')
     state = fields.Selection(
-        [('new', 'New'),
-         ('waiting_department_approval', 'Waiting Department Approval'),
-         ('waiting_head_approval', 'Waiting Head Approval'),
-         ('approved', 'Approved'),
-         ('purchase_order_created', 'Purchase Order Created'),
-         ('received', 'Received'),
-         ('cancelled', 'Cancelled')],
+        [('new', 'Nuevo'),
+         ('waiting_department_approval', 'En espera de la aprobación del departamento'),
+         ('waiting_head_approval', 'Esperando la aprobación del jefe'),
+         ('approved', 'Aprobado'),
+         ('purchase_order_created', 'Orden de compra creada'),
+         ('received', 'Recibido'),
+         ('cancelled', 'Cancelado')],
         default='new', copy=False, tracking=True)
 
     @api.model
