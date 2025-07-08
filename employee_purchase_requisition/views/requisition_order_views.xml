@@ -14,8 +14,8 @@
                 <field name="description"/>
                 <field name="quantity"/>
                 <field name="uom"/>
-                <field name="partner_id" invisible="1""/>
-                       invisible="requisition_type == 'internal_transfer'"
+                <field name="partner_id" 
+                       invisible="1"
                        groups="employee_purchase_requisition.employee_requisition_head,employee_purchase_requisition.employee_requisition_manager"/>
             </tree>
         </field>
