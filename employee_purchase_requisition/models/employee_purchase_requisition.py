@@ -141,6 +141,16 @@ class PurchaseRequisition(models.Model):
         result = super(PurchaseRequisition, self).create(vals)
         return result
 
+    
+    def copy(self, default=None):
+        """Al duplicar, genera un nuevo nombre y copia líneas."""
+        default = dict(default or {})
+
+        # Generar nuevo nombre usando el actual como base
+        default['name'] = f"{self.name or 'Requisición'} (Copia)"
+
+        return super(PurchaseRequisition, self).copy(default)
+
     def action_confirm_requisition(self):
         """Function to confirm purchase requisition"""
         self.source_location_id = (
