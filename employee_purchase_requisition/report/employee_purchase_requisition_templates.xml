@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<!--    purchase requisition report template-->
+<!--    plantilla del informe de requisición de compra -->
     <template id="report_purchase_requisition">
         <t t-call="web.external_layout">
             <t t-call="web.html_container">
                 <div class="page">
                     <t t-foreach="records" t-as="rec">
-                        <h5>Purchase Requisition :
+                        <h5>Requisición de Compra :
                             <t t-if="rec['name']">
                             <t t-esc="rec['name']"/>
                             </t>
                         </h5>
                         <table class="table table-striped">
                             <tr>
-                                <th>Employee</th>
+                                <th>Empleado</th>
                                 <td>
                                     <t t-if="rec['employee_id']">
                                     <t t-esc="rec['employee_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Requisition Date</th>
+                                <th>Fecha de Requisición</th>
                                 <td>
                                     <t t-if="rec['employee_id']">
                                     <t t-esc="rec['requisition_date']"/>
@@ -27,13 +27,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Department</th>
+                                <th>Departamento</th>
                                 <td>
                                     <t t-if="rec['dept_id']">
                                     <t t-esc="rec['dept_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Received Date</th>
+                                <th>Fecha de Recepción</th>
                                 <td>
                                     <t t-if="rec['receive_date']">
                                     <t t-esc="rec['receive_date']"/>
@@ -41,13 +41,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Requisition Responsible</th>
+                                <th>Responsable de la Requisición</th>
                                 <td>
                                     <t t-if="rec['user_id']">
                                     <t t-esc="rec['user_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Requisition Deadline</th>
+                                <th>Fecha Límite de la Requisición</th>
                                 <td>
                                     <t t-if="rec['requisition_deadline']">
                                     <t t-esc="rec['requisition_deadline']"/>
@@ -55,7 +55,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Company</th>
+                                <th>Compañía</th>
                                 <td>
                                     <t t-if="rec['company_id']">
                                     <t t-esc="rec['company_id'][1]"/>
@@ -63,16 +63,16 @@
                                 </td>
                             </tr>
                         </table>
-                        <h5>Other Information</h5>
+                        <h5>Otra Información</h5>
                         <table class="table table-sm">
                             <tr>
-                                <th>Confirmed By</th>
+                                <th>Confirmado Por</th>
                                 <td>
                                     <t t-if="rec['confirm_id']">
                                     <t t-esc="rec['confirm_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Confirmed Date</th>
+                                <th>Fecha de Confirmación</th>
                                 <td>
                                     <t t-if="rec['confirmed_date']">
                                     <t t-esc="rec['confirmed_date']"/>
@@ -80,13 +80,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Department Manager</th>
+                                <th>Gerente de Departamento</th>
                                 <td>
                                     <t t-if="rec['manager_id']">
                                     <t t-esc="rec['manager_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Department Approval Date</th>
+                                <th>Fecha de Aprobación del Departamento</th>
                                 <td>
                                     <t t-if="rec['department_approval_date']">
                                     <t t-esc="rec['department_approval_date']"/>
@@ -95,13 +95,13 @@
                             </tr>
 
                             <tr>
-                                <th>Approved By:</th>
+                                <th>Aprobado Por:</th>
                                 <td>
                                     <t t-if="rec['requisition_head_id']">
                                     <t t-esc="rec['requisition_head_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Approved Date:</th>
+                                <th>Fecha de Aprobación:</th>
                                 <td>
                                     <t t-if="rec['approval_date']">
                                     <t t-esc="rec['approval_date']"/>
@@ -109,13 +109,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Rejected By</th>
+                                <th>Rechazado Por</th>
                                 <td>
                                     <t t-if="rec['rejected_user_id']">
                                         <t t-esc="rec['rejected_user_id'][1]"/>
                                     </t>
                                 </td>
-                                <th>Rejected Date</th>
+                                <th>Fecha de Rechazo</th>
                                 <td>
                                     <t t-if="rec['reject_date']">
                                         <t t-esc="rec['reject_date']"/>
@@ -123,16 +123,16 @@
                                 </td>
                             </tr>
                         </table>
-                        <h5>Picking Details</h5>
+                        <h5>Detalles de Movimiento</h5>
                         <table class="table table-sm">
                             <tr>
-                                <th>Source Location</th>
+                                <th>Ubicación Origen</th>
                                 <td>
                                      <t t-if="rec['source_location_id']">
                                     <t t-esc="rec['source_location_id'][1]"/>
                                      </t>
                                 </td>
-                                <th>Destination Location</th>
+                                <th>Ubicación Destino</th>
                                 <td>
                                     <t t-if="rec['source_location_id']">
                                     <t t-esc="rec['destination_location_id'][1]"/>
@@ -141,13 +141,13 @@
                             </tr>
                             <tr>
                                 <t t-if="rec['delivery_type_id']">
-                                    <th>Delivery To</th>
+                                    <th>Entregar A</th>
                                     <td>
                                         <t t-esc="rec['delivery_type_id'][1]"/>
                                     </td>
                                 </t>
                                 <t t-if="rec['internal_picking_id']">
-                                    <th>Internal Transfer</th>
+                                    <th>Transferencia Interna</th>
                                     <td>
                                         <t t-esc="rec['internal_picking_id'][1]"/>
                                     </td>
@@ -156,23 +156,23 @@
                         </table>
                     </t>
 
-                    <h5>Requisition Lines</h5>
+                    <h5>Líneas de Requisición</h5>
                     <table class='table'>
                         <thead>
-                            <th>Requisition Action</th>
-                            <th>Product</th>
-                            <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Unit Of Measure</th>
+                            <th>Acción</th>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Unidad de Medida</th>
                         </thead>
                         <t t-foreach="order_ids" t-as="order">
                             <tbody>
                                 <td>
                                     <t t-if="order['requisition_type']=='internal_transfer'">
-                                        Internal Transfer
+                                        Transferencia Interna
                                     </t>
                                     <t t-if="order['requisition_type']=='purchase_order'">
-                                        Purchase Order
+                                        Orden de Compra
                                     </t>
                                 </td>
                                 <td>
@@ -197,12 +197,11 @@
                             </tbody>
                         </t>
                     </table>
-                    <h5>Employee Signature :</h5>
-                    <h5>Manager Signature :</h5>
-                    <h5>Approve Signature :</h5>
+                    <h5>Firma del Empleado :</h5>
+                    <h5>Firma del Gerente :</h5>
+                    <h5>Firma de Aprobación :</h5>
                 </div>
             </t>
         </t>
     </template>
 </odoo>
-
