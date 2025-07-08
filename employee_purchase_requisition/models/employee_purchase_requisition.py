@@ -184,8 +184,9 @@ class PurchaseRequisition(models.Model):
         self.reject_date = fields.Date.today()
 
     def action_create_purchase_order(self):
-        """Create purchase order and internal transfer"""
-        for rec in self.requisition_order_ids:
+        """Crea orden de compra o transferencia interna sólo con líneas aprobadas"""
+
+        for rec in self.requisition_order_ids.filtered('approved_line'):  # solo líneas aprobadas
             if rec.requisition_type == 'internal_transfer':
                 self.env['stock.picking'].create({
                     'location_id': self.source_location_id.id,
@@ -196,7 +197,7 @@ class PurchaseRequisition(models.Model):
                         'name': rec.product_id.name,
                         'product_id': rec.product_id.id,
                         'product_uom': rec.product_id.uom_id.id,
-                        'product_uom_qty': rec.quantity,
+                        'product_uom_qty': rec.approved_quantity,  # cantidad aprobada
                         'location_id': self.source_location_id.id,
                         'location_dest_id': self.destination_location_id.id,
                     })]
@@ -208,8 +209,9 @@ class PurchaseRequisition(models.Model):
                     'requisition_order': self.name,
                     "order_line": [(0, 0, {
                         'product_id': rec.product_id.id,
-                        'product_qty': rec.quantity,
-                    })]})
+                        'product_qty': rec.approved_quantity,  # cantidad aprobada
+                    })]
+                })
         self.write({'state': 'purchase_order_created'})
 
     def _compute_internal_transfer_count(self):
