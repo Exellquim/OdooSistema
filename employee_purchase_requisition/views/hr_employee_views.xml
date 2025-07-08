@@ -8,7 +8,7 @@
             ref="hr.view_employee_form"/>
      <field name="arch" type="xml">
          <xpath expr="//page[@name='hr_settings']" position="after">
-             <page name="requisition_settings" string="Purchase Requisition Settings">
+             <page name="requisition_settings" string="Configuración de solicitudes de compra">
                  <group>
                      <group>
                          <field name="employee_location_id"/>
