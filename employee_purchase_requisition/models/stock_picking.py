@@ -28,5 +28,5 @@ class Picking(models.Model):
     _inherit = 'stock.picking'
 
     requisition_order = fields.Char(
-        string='Requisition Order',
-        help='Requisition order sequence')
+        string='Orden de Requisición',
+        help='')
