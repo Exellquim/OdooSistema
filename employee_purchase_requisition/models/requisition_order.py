@@ -24,35 +24,35 @@ from odoo import api, fields, models
 
 class RequisitionProducts(models.Model):
     _name = 'requisition.order'
-    _description = 'Requisition order'
+    _description = 'Órden de Compra'
 
     requisition_product_id = fields.Many2one(
         comodel_name='employee.purchase.requisition',
-        help='Requisition product.')
+        help='Requisitar producto.')
     state = fields.Selection(
-        string='State',
+        string='Estado',
         related='requisition_product_id.state')
     requisition_type = fields.Selection(
-        string='Requisition Type',
-        selection=[('purchase_order', 'Purchase Order'),
-                   ('internal_transfer', 'Internal Transfer'), ],
-        help='Type of requisition', required=True, default='purchase_order')
+        string='Tipo de requisición',
+        selection=[('purchase_order', 'Órden de Compra'),
+                   ('internal_transfer', 'Transferencia Interna'), ],
+        help='Tipo de requisición', required=True, default='purchase_order')
     product_id = fields.Many2one(
         comodel_name='product.product', required=True,
-        help='Product')
+        help='Producto')
     description = fields.Text(
-        string="Description",
+        string="Descripción",
         compute='_compute_name',
         store=True, readonly=False,
-        precompute=True, help='Product description')
+        precompute=True, help='Descripción del Producto')
     quantity = fields.Integer(
-        string='Quantity', help='Product quantity')
+        string='Cantidad', help='Cantidad del producto')
     uom = fields.Char(
         related='product_id.uom_id.name',
-        string='Unit of Measure', help='Product unit of measure')
+        string='Unidad de Medida', help='Unidad de medida del producto')
     partner_id = fields.Many2one(
-        comodel_name='res.partner', string='Vendor',
-        help='Vendor for the requisition',readonly=False)
+        comodel_name='res.partner', string='Proveedor',
+        help='Proveedor para la requisición',readonly=False)
 
     @api.depends('product_id')
     def _compute_name(self):
