@@ -162,8 +162,6 @@ class PurchaseRequisition(models.Model):
     def action_department_approval(self):
         """Approval from department"""
         for rec in self.requisition_order_ids:
-            if rec.requisition_type == 'purchase_order' and not rec.partner_id:
-                raise ValidationError('Select a vendor')
         self.write({'state': 'waiting_head_approval'})
         self.manager_id = self.env.uid
         self.department_approval_date = fields.Date.today()
@@ -205,8 +203,9 @@ class PurchaseRequisition(models.Model):
                     })]
                 })
             else:
+                partner = rec.partner_id or self.env.company.partner_id
                 self.env['purchase.order'].create({
-                    'partner_id': rec.partner_id.id,
+                    'partner_id': partner.id,
                     'requisition_order': self.name,
                     "order_line": [(0, 0, {
                         'product_id': rec.product_id.id,
