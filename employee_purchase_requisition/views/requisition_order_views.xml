@@ -13,6 +13,8 @@
                 <field name="product_id"/>
                 <field name="description"/>
                 <field name="quantity"/>
+                <field name="approved_line"/>
+                <field name="approved_quantity"/>
                 <field name="uom"/>
                 <field name="partner_id" 
                        invisible="1"
