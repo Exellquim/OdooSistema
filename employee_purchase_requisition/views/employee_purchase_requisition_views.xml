@@ -24,43 +24,43 @@
                            statusbar_visible='new,waiting_department_approval,waiting_head_approval,approved,purchase_order_created,received'/>
                     <button name="action_confirm_requisition"
                             class="oe_highlight"
-                            invisible="state != 'new'" string="Confirm"
+                            invisible="state != 'new'" string="Confirmar"
                             type="object"
-                            help="Submit to Department Approval"
+                            help="Presentar a aprobación del departamento"
                             groups="employee_purchase_requisition.employee_requisition_user"/>
                     <button name="action_department_approval"
                             class="oe_highlight"
                             invisible="state != 'waiting_department_approval'"
-                            string="Approve" type="object"
-                            help="Approve purchase requisition,Submit for Approval for Requisition Head"
+                            string="Aprobar" type="object"
+                            help="Aprobar solicitud de compra،Presentar aprobación para el jefe de solicitud"
                             groups="employee_purchase_requisition.employee_requisition_head"/>
                     <button name="action_department_cancel"
                             class="oe_highlight"
                             invisible="state != 'waiting_department_approval'"
-                            string="Reject" type="object"
-                            help="Reject Purchase Requisition"
+                            string="Rechazar" type="object"
+                            help="Rechazar solicitud de compra"
                             groups="employee_purchase_requisition.employee_requisition_head"/>
                     <button name="action_head_approval" class="oe_highlight"
                             invisible="state != 'waiting_head_approval'"
-                            string="Approve"
+                            string="Aprobar"
                             type="object"
-                            help="Approve Purchase requisition"
+                            help="Aprobar solicitud de compra"
                             groups="employee_purchase_requisition.employee_requisition_manager"/>
                     <button name="action_head_cancel" class="oe_highlight"
                             invisible="state != 'waiting_head_approval'"
-                            string="Reject"
+                            string="Rechazar"
                             type="object"
-                            help="Reject Purchase Requisition"
+                            help="Rechazar solicitud de compra"
                             groups="employee_purchase_requisition.employee_requisition_manager"/>
                     <button name="action_create_purchase_order"
                             class="oe_highlight"
                             invisible="state != 'approved'"
-                            string="Create Picking and PO"
+                            string="Crear Orden de Compra"
                             type="object"
-                            help="Create Picking/Purchase order"/>
+                            help=""/>
                     <button name="action_receive" class="oe_highlight"
                             invisible="state != 'purchase_order_created'"
-                            string="Received"
+                            string="Recibido"
                             type="object"
                             groups="employee_purchase_requisition.employee_requisition_manager"/>
                 </header>
@@ -77,7 +77,7 @@
                                 name="get_internal_transfer"
                                 icon="fa-truck"
                                 invisible="not internal_transfer_count">
-                            <field string="Internal Transfer"
+                            <field string="Transferencia interna"
                                    name="internal_transfer_count"
                                    widget="statinfo"
                             />
@@ -102,10 +102,10 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Requisition Orders ">
+                        <page string="Orden de Requisición">
                             <field name="requisition_order_ids" readonly="1 if state not in ['new','waiting_department_approval','waiting_head_approval'] else 0"/>
                         </page>
-                        <page string="Picking Details"
+                        <page string="Detalles Picking"
                               groups="employee_purchase_requisition.employee_requisition_manager,employee_purchase_requisition.employee_requisition_head">
                             <group>
                                 <group>
@@ -118,7 +118,7 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Other Info">
+                        <page string="Otra Información">
                             <group>
                                 <group>
                                     <field name="confirm_id"/>
