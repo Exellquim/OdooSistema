@@ -28,5 +28,5 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     requisition_order = fields.Char(
-        string='Requisition Order',
-        help='Set a requisition Order')
+        string='Orden de requisición',
+        help='')
