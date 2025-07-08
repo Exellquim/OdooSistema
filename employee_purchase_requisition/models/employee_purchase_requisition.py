@@ -161,7 +161,6 @@ class PurchaseRequisition(models.Model):
 
     def action_department_approval(self):
         """Approval from department"""
-        for rec in self.requisition_order_ids:
         self.write({'state': 'waiting_head_approval'})
         self.manager_id = self.env.uid
         self.department_approval_date = fields.Date.today()
