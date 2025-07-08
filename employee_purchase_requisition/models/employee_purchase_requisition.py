@@ -143,14 +143,20 @@ class PurchaseRequisition(models.Model):
 
     
     def copy(self, default=None):
-        """Override para duplicar correctamente y generar nuevo número de referencia"""
+        """Al duplicar, asignar nuevo nombre y copiar manualmente las líneas de requisición."""
         default = dict(default or {})
-
-        # Asignar nuevo número de secuencia
         default['name'] = self.env['ir.sequence'].next_by_code('employee.purchase.requisition') or _('Nuevo')
 
-        # Retornar duplicado completo (incluye líneas por defecto)
-        return super(PurchaseRequisition, self).copy(default)
+        # Crear la copia del encabezado
+        new_requisition = super(PurchaseRequisition, self).copy(default)
+
+        # Copiar líneas
+        for line in self.requisition_order_ids:
+            line.copy({
+                'requisition_product_id': new_requisition.id
+            })
+
+        return new_requisition
 
 
     def action_confirm_requisition(self):
