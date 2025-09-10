@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Wizard Form -->
     <record id="view_employee_rotation_report_wizard_form" model="ir.ui.view">
         <field name="name">employee.rotation.report.wizard.form</field>
         <field name="model">employee.rotation.report.wizard</field>
@@ -18,23 +17,22 @@
         </field>
     </record>
 
-    <!-- Result Lines: Tree -->
     <record id="view_employee_rotation_line_tree" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.tree</field>
         <field name="model">employee.rotation.report.line</field>
         <field name="arch" type="xml">
             <tree string="Resultados de Rotación por Estado">
                 <field name="estado"/>
+                <field name="fecha"/>      
                 <field name="inicio"/>
                 <field name="fin"/>
                 <field name="rotacion"/>
                 <field name="ingreso"/>
-                <field name="porcentaje" widget="percentage"/>
+                <field name="porcentaje"/>
             </tree>
         </field>
     </record>
 
-    <!-- Result Lines: Graph (porcentaje por estado) -->
     <record id="view_employee_rotation_line_graph" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.graph</field>
         <field name="model">employee.rotation.report.line</field>
@@ -46,7 +44,7 @@
         </field>
     </record>
 
-    <!-- Action to display results -->
+    
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
@@ -56,7 +54,7 @@
         </field>
     </record>
 
-    <!-- Wizard action -->
+    
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
@@ -64,8 +62,7 @@
         <field name="view_id" ref="view_employee_rotation_report_wizard_form"/>
         <field name="target">new</field>
     </record>
-
-    <!-- Menú -->
+    
     <menuitem id="menu_hr_rotation_root" name="Reportes RH" parent="hr.menu_hr_root" sequence="95"/>
     <menuitem id="menu_hr_rotation_wizard" name="Rotación por Estado"
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
