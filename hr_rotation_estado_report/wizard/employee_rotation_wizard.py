@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 
-ESTADO_FIELD = "x_studio_estado_del_empleado"  
+ESTADO_FIELD = "x_studio_estado_del_empleado"  # campo para agrupar
 
 
 def _month_bounds(any_day: date):
@@ -46,7 +46,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
             ("departure_date", "=", False),
             ("departure_date", ">", day),
         ]
-        
+        # Solo leemos el campo de estado para agrupar
         return self.env["hr.employee"].sudo().search_read(domain, [ESTADO_FIELD], limit=0)
 
     def _employees_archived_in_month(self, mstart: date, nstart: date):
@@ -69,20 +69,27 @@ class EmployeeRotationReportWizard(models.TransientModel):
 
     def action_compute(self):
         self.ensure_one()
+        # limpiar resultados previos
         self.line_ids.unlink()
 
+        # mes objetivo
         mstart, nstart, mend = _month_bounds(self.target_month)
+        # fin del mes previo (para INICIO)
         prev_end = mstart - relativedelta(days=1)
 
+        # INICIO: presentes al cierre del mes previo
         emp_inicio = self._employees_present_on(prev_end)
         inicio_by_estado = self._group_count_by_estado(emp_inicio)
 
+        # FIN: presentes al cierre del mes objetivo
         emp_fin = self._employees_present_on(mend)
         fin_by_estado = self._group_count_by_estado(emp_fin)
 
+        # ROTACION: archivados dentro del mes objetivo
         emp_rot = self._employees_archived_in_month(mstart, nstart)
         rot_by_estado = self._group_count_by_estado(emp_rot)
 
+        # union de estados
         all_estados = set(inicio_by_estado.keys()) | set(fin_by_estado.keys()) | set(rot_by_estado.keys())
 
         Line = self.env["employee.rotation.report.line"].sudo()
@@ -91,11 +98,13 @@ class EmployeeRotationReportWizard(models.TransientModel):
             fin = fin_by_estado.get(estado, 0)
             rot = rot_by_estado.get(estado, 0)
             ingreso = (inicio + fin) / 2.0
-            porcentaje = (rot / ingreso) if ingreso else 0.0
+            # Guardamos porcentaje como 0..100 para que el gráfico muestre 13 (no 0.13)
+            porcentaje = (rot / ingreso * 100.0) if ingreso else 0.0
 
             Line.create({
                 "wizard_id": self.id,
                 "estado": estado,
+                "fecha": mend,      # <-- NUEVO: fecha del mes consultado (cierre de mes)
                 "inicio": inicio,
                 "fin": fin,
                 "rotacion": rot,
@@ -116,11 +125,12 @@ class EmployeeRotationReportLine(models.TransientModel):
     wizard_id = fields.Many2one("employee.rotation.report.wizard", ondelete="cascade")
 
     estado = fields.Char(string="Estado del empleado", required=True, index=True)
+    fecha = fields.Date(string="Fecha", required=True)  # <-- NUEVO
     inicio = fields.Integer(string="Inicio", required=True, default=0)
     fin = fields.Integer(string="Fin", required=True, default=0)
     rotacion = fields.Integer(string="Rotacion", required=True, default=0)
     ingreso = fields.Float(string="Ingreso", digits=(16, 2), required=True, default=0.0,
                            help="(Inicio + Fin) / 2")
+    # Guardamos el valor 0..100 (no 0..1) para que el gráfico no necesite multiplicar
     porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
                               help="Rotacion / Ingreso * 100")
-
