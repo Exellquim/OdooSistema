@@ -28,7 +28,7 @@
                 <field name="fin"/>
                 <field name="rotacion"/>
                 <field name="ingreso"/>
-                <field name="porcentaje"/>
+                <field name="porcentaje_txt"/>
             </tree>
         </field>
     </record>
@@ -68,3 +68,4 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
