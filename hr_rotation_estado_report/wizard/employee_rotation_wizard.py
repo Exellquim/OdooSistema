@@ -91,13 +91,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
             rot = rot_by_estado.get(estado, 0)
             ingreso = (inicio + fin) / 2.0
             porcentaje = (rot / ingreso * 100.0) if ingreso else 0.0
-            porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
-
-            @api.depends("porcentaje")
-            def _compute_porcentaje_txt(self):
-                for rec in self:
-                    rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
-
+            
             Line.create({
                 "wizard_id": self.id,
                 "estado": estado,
@@ -130,4 +124,12 @@ class EmployeeRotationReportLine(models.TransientModel):
                            help="(Inicio + Fin) / 2")
     porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
                               help="Rotacion / Ingreso * 100")
+    porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
+
+    @api.depends("porcentaje")
+    def _compute_porcentaje_txt(self):
+        for rec in self:
+            rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
+
 
