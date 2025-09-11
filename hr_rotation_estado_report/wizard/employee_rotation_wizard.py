@@ -116,7 +116,7 @@ class EmployeeRotationReportLine(models.TransientModel):
     wizard_id = fields.Many2one("employee.rotation.report.wizard", ondelete="cascade")
 
     estado = fields.Char(string="Estado del empleado", required=True, index=True)
-    #fecha = fields.Date(string="Fecha", required=True)  # <-- NUEVO
+    fecha = fields.Date(string="Fecha", required=True)  # <-- NUEVO
     inicio = fields.Integer(string="Inicio", required=True, default=0)
     fin = fields.Integer(string="Fin", required=True, default=0)
     rotacion = fields.Integer(string="Rotacion", required=True, default=0)
@@ -125,24 +125,12 @@ class EmployeeRotationReportLine(models.TransientModel):
     porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
                               help="Rotacion / Ingreso * 100")
     porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
-    fecha = fields.Date(string="Fecha", required=True)
-    mes_nombre = fields.Char(string="Mes", compute="_compute_mes_nombre", store=False)
-
-    @api.depends('fecha')
-    def _compute_mes_nombre(self):
-        for rec in self:
-            if rec.fecha:
-                # 'MMMM' => nombre del mes completo, respeta el idioma del usuario
-                rec.mes_nombre = format_date(
-                    rec.env, rec.fecha, date_format='MMMM',
-                    lang_code=self.env.context.get('lang')
-                ).capitalize()
-            else:
-                rec.mes_nombre = False
+   
     @api.depends("porcentaje")
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
 
 
 
