@@ -126,11 +126,7 @@ class EmployeeRotationReportLine(models.TransientModel):
                               help="Rotacion / Ingreso * 100")
     porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
     fecha = fields.Date(string="Fecha", required=True)
-    mes_nombre = fields.Char(
-        string="Mes",
-        compute="_compute_mes_nombre",
-        store=False,        # pon True si quieres poder filtrar/ordenar por él
-    )
+    mes_nombre = fields.Char(string="Mes", compute="_compute_mes_nombre", store=False)
 
     @api.depends('fecha')
     def _compute_mes_nombre(self):
@@ -147,6 +143,7 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
 
 
 
