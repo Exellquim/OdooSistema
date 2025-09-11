@@ -23,7 +23,7 @@
         <field name="arch" type="xml">
             <tree string="Resultados de Rotación por Estado">
                 <field name="estado"/>
-                <field name="fecha"/>      
+                <field name="mes_nombre"/>      
                 <field name="inicio"/>
                 <field name="fin"/>
                 <field name="rotacion"/>
@@ -68,4 +68,5 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
 
