@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
-
+from odoo.tools.misc import format_date 
 from odoo import api, fields, models, _
 
 ESTADO_FIELD = "x_studio_estado_del_empleado"  
@@ -149,6 +149,7 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
 
 
 
