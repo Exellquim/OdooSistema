@@ -30,10 +30,10 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             'Monto Pendiente', 'Estado Pago', 'Folio Pago',
             'Fecha Pago', 'moneda pago', 'Monto Pagado', 'monto pagado conversion'
         ]
-
         for col, h in enumerate(headers):
             sheet.write(0, col, h, bold)
 
+        # Dominio: facturas de venta / NC, posteadas; opcionalmente por fecha de factura
         domain = [('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '=', 'posted')]
         if self.date_start:
             domain.append(('invoice_date', '>=', self.date_start))
@@ -63,6 +63,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             moneda_factura = inv.currency_id and inv.currency_id.name or ''
             total_factura = inv.amount_total
 
+            # Totales convertidos a MXN con fecha de la factura
             subtotal_mxn = inv.currency_id._convert(inv.amount_untaxed, mxn, company, fecha_factura)
             impuesto_mxn = inv.currency_id._convert(inv.amount_tax, mxn, company, fecha_factura)
             total_mxn = inv.currency_id._convert(inv.amount_total, mxn, company, fecha_factura)
@@ -70,7 +71,10 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
 
-            receivables = inv.line_ids.filtered(lambda l: l.account_internal_type in ('receivable', 'payable'))
+            # ✅ Odoo 17: filtrar por tipo de cuenta usando account_id.account_type
+            receivables = inv.line_ids.filtered(
+                lambda l: l.account_id.account_type in ('asset_receivable', 'liability_payable')
+            )
             matched_parts = (receivables.mapped('matched_debit_ids') | receivables.mapped('matched_credit_ids'))
 
             if not matched_parts:
@@ -80,7 +84,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 sheet.write(row, c, cliente); c += 1
                 sheet.write(row, c, rfc); c += 1
                 sheet.write(row, c, pais); c += 1
-                sheet.write_datetime(row, c, fecha_factura, datefmt); c += 1
+                sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
                 sheet.write(row, c, moneda_factura); c += 1
                 sheet.write_number(row, c, total_factura, money); c += 1
                 sheet.write_number(row, c, subtotal_mxn, money); c += 1
@@ -88,33 +92,56 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 sheet.write_number(row, c, total_mxn, money); c += 1
                 sheet.write_number(row, c, monto_pendiente, money); c += 1
                 sheet.write(row, c, estado_pago); c += 1
-                sheet.write(row, c, ''); c += 1
-                sheet.write(row, c, ''); c += 1
-                sheet.write(row, c, ''); c += 1
-                sheet.write(row, c, ''); c += 1
-                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1  # Folio Pago
+                sheet.write(row, c, ''); c += 1  # Fecha Pago
+                sheet.write(row, c, ''); c += 1  # Moneda pago
+                sheet.write(row, c, ''); c += 1  # Monto pagado
+                sheet.write(row, c, ''); c += 1  # Monto pagado MXN
                 row += 1
                 continue
 
             for m in matched_parts:
-                move = m.debit_move_id.move_id or m.credit_move_id.move_id
-                pago = getattr(move, 'payment_id', False)
-                folio_pago = (pago and pago.name) or (move and move.name) or ''
-                fecha_pago = (pago and pago.date) or (move and move.date) or None
+                # === Identificar la línea y asiento del PAGO (no el de la factura) ===
+                # Si el debit_move_id pertenece a la factura, la línea de pago será la credit_move_id; y viceversa.
+                pay_ml = m.debit_move_id if m.debit_move_id.move_id.id != inv.id else m.credit_move_id
+                pay_move = pay_ml.move_id
+                pago = getattr(pay_move, 'payment_id', False)
 
-                pago_currency = (pago and pago.currency_id) or (move and move.currency_id) or inv.currency_id
-                moneda_pago = pago_currency.name if pago_currency else ''
+                # Folio de pago: primero payment.name; si no, ref o name del asiento
+                folio_pago = (pago and pago.name) or pay_move.ref or pay_move.name or ''
 
-                monto_pagado = m.amount
+                # Fecha de pago: primero payment.date; si no, fecha del asiento del pago
+                fecha_pago = (pago and pago.date) or pay_move.date
+
+                # Moneda del pago: la de la línea del pago; si no hay, usa la moneda de la compañía
+                pago_currency = pay_ml.currency_id or company.currency_id
+                moneda_pago = pago_currency.name
+
+                # Monto pagado en MONEDA DEL PAGO
+                # No usar m.amount (está en moneda de la compañía).
+                if pay_ml.id == m.credit_move_id.id:
+                    amount_in_pay_cur = abs(m.credit_amount_currency or 0.0)
+                else:
+                    amount_in_pay_cur = abs(m.debit_amount_currency or 0.0)
+
+                if not pay_ml.currency_id or pay_ml.currency_id == company.currency_id:
+                    # La línea está en moneda de la compañía => usar m.amount
+                    monto_pagado = abs(m.amount or 0.0)
+                else:
+                    # Usar el amount_currency específico en la línea del pago
+                    monto_pagado = amount_in_pay_cur
+
+                # Conversión a MXN (o a la que necesites) con FECHA DE PAGO
                 monto_pagado_mxn = pago_currency._convert(monto_pagado, mxn, company, fecha_pago or fecha_factura)
 
+                # --- Escribir fila ---
                 c = 0
                 sheet.write(row, c, folio); c += 1
                 sheet.write(row, c, uuid); c += 1
                 sheet.write(row, c, cliente); c += 1
                 sheet.write(row, c, rfc); c += 1
                 sheet.write(row, c, pais); c += 1
-                sheet.write_datetime(row, c, fecha_factura, datefmt); c += 1
+                sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
                 sheet.write(row, c, moneda_factura); c += 1
                 sheet.write_number(row, c, total_factura, money); c += 1
                 sheet.write_number(row, c, subtotal_mxn, money); c += 1
@@ -124,21 +151,23 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 sheet.write(row, c, estado_pago); c += 1
                 sheet.write(row, c, folio_pago); c += 1
                 if fecha_pago:
-                    sheet.write_datetime(row, c, fecha_pago, datefmt)
+                    sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_pago), datefmt)
                 else:
                     sheet.write(row, c, '')
                 c += 1
                 sheet.write(row, c, moneda_pago); c += 1
-                sheet.write_number(row, c, monto_pagado, money); c += 1
-                sheet.write_number(row, c, monto_pagado_mxn, money); c += 1
+                sheet.write_number(row, c, monto_pagado, money); c += 1          # Monto en moneda del pago
+                sheet.write_number(row, c, monto_pagado_mxn, money); c += 1     # Conversión a MXN
                 row += 1
 
+        # Fila de totales
         total_row = row + 1
         sheet.write(total_row, 0, "TOTALES", bold)
 
+        # Columnas numéricas que se suman
         numeric_cols = [7, 8, 9, 10, 11, 16, 17]
         for col in numeric_cols:
-            col_letter = chr(ord('A') + col)  # A=0, B=1...
+            col_letter = chr(ord('A') + col)  # A=0, B=1, ...
             formula = f"=SUM({col_letter}2:{col_letter}{row})"
             sheet.write_formula(total_row, col, formula, money)
 
@@ -151,6 +180,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
         })
         return {
             'type': 'ir.actions.act_url',
-            'url': '/web/content?model=%s&id=%s&field=file&filename=%s&download=true' % (self._name, self.id, self.file_name),
+            'url': '/web/content?model=%s&id=%s&field=file&filename=%s&download=true'
+                   % (self._name, self.id, self.file_name),
             'target': 'self',
         }
