@@ -39,7 +39,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
         Incluye activos y archivados (active_test=False).
         """
         self = self.with_context(active_test=False)
-        _, next_month_start, _ = _month_bounds(day)
+        _, next_month_start, mend = _month_bounds(day)
         domain = [
             ("create_date", "<", datetime.combine(next_month_start, datetime.min.time())),
             "|",
@@ -110,7 +110,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
     def action_view_archived_employees(self, estado=None):
         """Ver empleados archivados en el mes (y opcionalmente por estado)."""
         self.ensure_one()
-        mstart, nstart, _ = _month_bounds(self.target_month)
+        mstart, nstart, mend = _month_bounds(self.target_month)
 
         domain = [
             ("departure_date", ">=", mstart),
