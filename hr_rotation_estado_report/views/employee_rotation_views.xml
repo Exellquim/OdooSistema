@@ -1,38 +1,85 @@
-<record id="view_employee_rotation_line_tree" model="ir.ui.view">
-    <field name="name">employee.rotation.report.line.tree</field>
-    <field name="model">employee.rotation.report.line</field>
-    <field name="arch" type="xml">
-        <tree string="Resultados de Rotación por Estado">
-            <field name="estado"/>
-            <field name="mes_nombre" string="Mes"/>    
-            <field name="inicio"/>
-            <field name="fin"/>
-            <field name="rotacion"/>
-            <field name="ingreso"/>
-            <field name="porcentaje_txt"/>
-        </tree>
-    </field>
-</record>
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
 
-<!-- Acción secundaria en el listado -->
-<record id="action_employee_rotation_lines" model="ir.actions.act_window">
-    <field name="name">Rotación por Estado</field>
-    <field name="res_model">employee.rotation.report.line</field>
-    <field name="view_mode">tree,graph</field>
-    <field name="help" type="html">
-        <p>Tabla y gráfica de rotación por estado del empleado para el mes elegido.</p>
-    </field>
-    <field name="context">{}</field>
-</record>
+    <!-- Wizard -->
+    <record id="view_employee_rotation_report_wizard_form" model="ir.ui.view">
+        <field name="name">employee.rotation.report.wizard.form</field>
+        <field name="model">employee.rotation.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reporte de Rotación por Estado" create="false" edit="false">
+                <group>
+                    <field name="target_month"/>
+                </group>
+                <footer>
+                    <button name="action_compute" type="object" string="Calcular" class="btn-primary"/>
+                    <button string="Cerrar" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 
-<!-- Botón en "Acciones" del listado -->
-<record id="action_view_archived_employees_from_lines" model="ir.actions.server">
-    <field name="name">Ver Archivados</field>
-    <field name="model_id" ref="model_employee_rotation_report_line"/>
-    <field name="binding_model_id" ref="model_employee_rotation_report_line"/>
-    <field name="binding_view_types">tree</field>
-    <field name="state">code</field>
-    <field name="code">
-action = records.mapped('wizard_id').action_view_archived_employees()
-    </field>
-</record>
+    <!-- Tree de resultados -->
+    <record id="view_employee_rotation_line_tree" model="ir.ui.view">
+        <field name="name">employee.rotation.report.line.tree</field>
+        <field name="model">employee.rotation.report.line</field>
+        <field name="arch" type="xml">
+            <tree string="Resultados de Rotación por Estado">
+                <field name="estado"/>
+                <field name="mes_nombre" string="Mes"/>    
+                <field name="inicio"/>
+                <field name="fin"/>
+                <field name="rotacion"/>
+                <field name="ingreso"/>
+                <field name="porcentaje_txt"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Gráfico -->
+    <record id="view_employee_rotation_line_graph" model="ir.ui.view">
+        <field name="name">employee.rotation.report.line.graph</field>
+        <field name="model">employee.rotation.report.line</field>
+        <field name="arch" type="xml">
+            <graph string="% Rotación por Estado" type="bar">
+                <field name="estado" type="row"/>
+                <field name="porcentaje" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Acción principal -->
+    <record id="action_employee_rotation_lines" model="ir.actions.act_window">
+        <field name="name">Rotación por Estado</field>
+        <field name="res_model">employee.rotation.report.line</field>
+        <field name="view_mode">tree,graph</field>
+        <field name="help" type="html">
+            <p>Tabla y gráfica de rotación por estado del empleado para el mes elegido.</p>
+        </field>
+    </record>
+
+    <!-- Acción secundaria: Ver Archivados -->
+    <record id="action_view_archived_employees_from_lines" model="ir.actions.server">
+        <field name="name">Ver Archivados</field>
+        <field name="model_id" ref="model_employee_rotation_report_line"/>
+        <field name="binding_model_id" ref="model_employee_rotation_report_line"/>
+        <field name="binding_view_types">tree</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records and records[0].wizard_id.action_view_archived_employees(records[0].estado) or None
+        </field>
+    </record>
+
+    <!-- Menús -->
+    <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte de Rotación por Estado</field>
+        <field name="res_model">employee.rotation.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employee_rotation_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+    
+    <menuitem id="menu_hr_rotation_root" name="Reportes RH" parent="hr.menu_hr_root" sequence="95"/>
+    <menuitem id="menu_hr_rotation_wizard" name="Rotación por Estado"
+              parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
+
+</odoo>
