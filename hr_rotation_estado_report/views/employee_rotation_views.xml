@@ -11,6 +11,7 @@
                 </group>
                 <footer>
                     <button name="action_compute" type="object" string="Calcular" class="btn-primary"/>
+                    <button name="action_view_archived_employees" type="object" string="Ver Archivados" class="btn-secondary"/>
                     <button string="Cerrar" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
@@ -44,7 +45,6 @@
         </field>
     </record>
 
-    
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
@@ -54,7 +54,6 @@
         </field>
     </record>
 
-    
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
@@ -68,6 +67,3 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
-
-
-
