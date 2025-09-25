@@ -107,8 +107,8 @@ class EmployeeRotationReportWizard(models.TransientModel):
         action["domain"] = [("wizard_id", "=", self.id)]
         return action
 
-    def action_view_archived_employees(self):
-        """Ver empleados archivados en el mes seleccionado"""
+    def action_view_archived_employees(self, estado=None):
+        """Ver empleados archivados en el mes (y opcionalmente por estado)."""
         self.ensure_one()
         mstart, nstart, _ = _month_bounds(self.target_month)
 
@@ -116,6 +116,8 @@ class EmployeeRotationReportWizard(models.TransientModel):
             ("departure_date", ">=", mstart),
             ("departure_date", "<", nstart),
         ]
+        if estado:
+            domain.append((ESTADO_FIELD, "=", estado))
 
         return {
             "name": _("Empleados Archivados"),
@@ -123,7 +125,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
             "res_model": "hr.employee",
             "view_mode": "tree,form",
             "domain": domain,
-            "context": {"active_test": False}, 
+            "context": {"active_test": False},  
         }
 
 
@@ -135,7 +137,7 @@ class EmployeeRotationReportLine(models.TransientModel):
     wizard_id = fields.Many2one("employee.rotation.report.wizard", ondelete="cascade")
 
     estado = fields.Char(string="Estado del empleado", required=True, index=True)
-    fecha = fields.Date(string="Fecha", required=True)  # <-- NUEVO
+    fecha = fields.Date(string="Fecha", required=True)
     inicio = fields.Integer(string="Inicio", required=True, default=0)
     fin = fields.Integer(string="Fin", required=True, default=0)
     rotacion = fields.Integer(string="Rotacion", required=True, default=0)
