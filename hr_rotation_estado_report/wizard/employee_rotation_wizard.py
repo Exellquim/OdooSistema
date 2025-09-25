@@ -125,7 +125,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
             "res_model": "hr.employee",
             "view_mode": "tree,form",
             "domain": domain,
-            "context": {"active_test": False},  
+            "context": {"active_test": False},  # incluye archivados
         }
 
 
@@ -151,6 +151,11 @@ class EmployeeRotationReportLine(models.TransientModel):
         compute='_compute_mes_nombre',
         store=False,
     )
+
+    def action_open_archived_employees(self):
+        """Abrir empleados archivados para esta línea (mes + estado)."""
+        self.ensure_one()
+        return self.wizard_id.action_view_archived_employees(self.estado)
 
     @api.depends('fecha')
     def _compute_mes_nombre(self):
