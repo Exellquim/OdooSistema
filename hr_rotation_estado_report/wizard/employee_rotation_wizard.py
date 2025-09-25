@@ -107,6 +107,25 @@ class EmployeeRotationReportWizard(models.TransientModel):
         action["domain"] = [("wizard_id", "=", self.id)]
         return action
 
+    def action_view_archived_employees(self):
+        """Ver empleados archivados en el mes seleccionado"""
+        self.ensure_one()
+        mstart, nstart, _ = _month_bounds(self.target_month)
+
+        domain = [
+            ("departure_date", ">=", mstart),
+            ("departure_date", "<", nstart),
+        ]
+
+        return {
+            "name": _("Empleados Archivados"),
+            "type": "ir.actions.act_window",
+            "res_model": "hr.employee",
+            "view_mode": "tree,form",
+            "domain": domain,
+            "context": {"active_test": False}, 
+        }
+
 
 class EmployeeRotationReportLine(models.TransientModel):
     _name = "employee.rotation.report.line"
@@ -125,11 +144,10 @@ class EmployeeRotationReportLine(models.TransientModel):
     porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
                               help="Rotacion / Ingreso * 100")
     porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
-    fecha = fields.Date(string="Fecha", required=True)
     mes_nombre = fields.Char(
         string="Mes",
         compute='_compute_mes_nombre',
-        store=False,   # pon True si quieres guardar y poder agrupar/ordenar
+        store=False,
     )
 
     @api.depends('fecha')
@@ -143,17 +161,7 @@ class EmployeeRotationReportLine(models.TransientModel):
             else:
                 rec.mes_nombre = False
 
-
-    
     @api.depends("porcentaje")
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
-
-
-
-
-
-
-
-
