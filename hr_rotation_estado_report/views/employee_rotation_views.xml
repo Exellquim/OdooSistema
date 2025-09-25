@@ -18,12 +18,18 @@
         </field>
     </record>
 
-    <!-- Tree de resultados -->
+    <!-- Tree de resultados con botón en el header -->
     <record id="view_employee_rotation_line_tree" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.tree</field>
         <field name="model">employee.rotation.report.line</field>
         <field name="arch" type="xml">
             <tree string="Resultados de Rotación por Estado">
+                <header>
+                    <button name="%(action_view_archived_employees_from_lines)d"
+                            string="Ver Archivados"
+                            type="action"
+                            class="btn-secondary"/>
+                </header>
                 <field name="estado"/>
                 <field name="mes_nombre" string="Mes"/>    
                 <field name="inicio"/>
@@ -61,8 +67,6 @@
     <record id="action_view_archived_employees_from_lines" model="ir.actions.server">
         <field name="name">Ver Archivados</field>
         <field name="model_id" ref="model_employee_rotation_report_line"/>
-        <field name="binding_model_id" ref="model_employee_rotation_report_line"/>
-        <field name="binding_view_types">tree</field>
         <field name="state">code</field>
         <field name="code">
 action = records and records[0].wizard_id.action_view_archived_employees(records[0].estado) or None
