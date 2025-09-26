@@ -32,10 +32,11 @@
                 <field name="ingreso"/>
                 <field name="porcentaje_txt"/>
                 <button name="action_open_archived_employees"
-                        type="object"
-                        icon="fa-user-cog"
-                        class="btn-secondary"
-                        string=""/>
+        type="object"
+        class="btn btn-secondary"
+        title="Empleados Archivados">
+    <i class="fa fa-user-cog"/>
+</button>
             </tree>
         </field>
     </record>
@@ -76,3 +77,4 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
