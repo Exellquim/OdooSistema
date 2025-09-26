@@ -120,12 +120,12 @@ class EmployeeRotationReportWizard(models.TransientModel):
             domain.append((ESTADO_FIELD, "=", estado))
 
         return {
-            "name": _("Empleados Archivados"),
+            "name": _("Empleados Rotación"),
             "type": "ir.actions.act_window",
             "res_model": "hr.employee",
             "view_mode": "tree,form",
             "domain": domain,
-            "context": {"active_test": False},  # incluye archivados
+            "context": {"active_test": False},  
         }
 
 
@@ -172,3 +172,4 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
