@@ -33,7 +33,7 @@
                 <field name="porcentaje_txt"/>
                 <button name="action_open_archived_employees"
             type="object"
-            icon="fa-user-cog"
+            icon="fa-eye"
             title="Empleados Archivados"/>
             </tree>
         </field>
@@ -75,5 +75,6 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
 
 
