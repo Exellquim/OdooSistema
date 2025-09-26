@@ -34,7 +34,7 @@
                 <button name="action_open_archived_employees"
             type="object"
             icon="fa-eye"
-            title="Empleados Archivados"/>
+            title="Empleados Rotación"/>
             </tree>
         </field>
     </record>
@@ -75,6 +75,7 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
 
 
 
