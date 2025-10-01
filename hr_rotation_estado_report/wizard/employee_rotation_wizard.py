@@ -62,7 +62,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
         """Group list of dicts by ESTADO_FIELD. Empty -> 'Sin Estado'."""
         counts = {}
         for rec in records:
-            key = rec.get(ESTADO_FIELD) or _("Sin Estado")
+            key = rec.get(ESTADO_FIELD) or _(" ")
             counts[key] = counts.get(key, 0) + 1
         return counts
 
@@ -172,4 +172,5 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
+
 
