@@ -59,10 +59,10 @@ class EmployeeRotationReportWizard(models.TransientModel):
 
     @api.model
     def _group_count_by_estado(self, records):
-        """Group list of dicts by ESTADO_FIELD. Empty -> 'Sin Estado'."""
+        """Agrupar por estado; si está vacío, mostrar como 'Sin Estado' en el reporte."""
         counts = {}
         for rec in records:
-            key = rec.get(ESTADO_FIELD) or _(" ")
+            key = rec.get(ESTADO_FIELD) or "Sin Estado"
             counts[key] = counts.get(key, 0) + 1
         return counts
 
@@ -117,7 +117,10 @@ class EmployeeRotationReportWizard(models.TransientModel):
             ("departure_date", "<", nstart),
         ]
         if estado:
-            domain.append((ESTADO_FIELD, "=", estado))
+            if estado == "Sin Estado":
+                domain.append((ESTADO_FIELD, "=", False))
+            else:
+                domain.append((ESTADO_FIELD, "=", estado))
 
         return {
             "name": _("Empleados Rotación"),
@@ -172,5 +175,3 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
-
-
