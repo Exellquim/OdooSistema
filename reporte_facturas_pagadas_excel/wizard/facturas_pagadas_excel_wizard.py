@@ -64,7 +64,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             total_factura = inv.amount_total
 
             # Totales convertidos a MXN con fecha de la factura
-            subtotal_mxn = inv.currency_id._convert(inv.amount_untaxed, mxn, company, fecha_factura)
+            subtotal_mxn = inv.amount_untaxed_signed
             impuesto_mxn = inv.currency_id._convert(inv.amount_tax, mxn, company, fecha_factura)
             total_mxn = inv.currency_id._convert(inv.amount_total, mxn, company, fecha_factura)
 
