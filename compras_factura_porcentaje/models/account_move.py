@@ -13,6 +13,7 @@ class PurchaseOrder(models.Model):
 
         if subtotal_oc > 0 and subtotal_factura > 0:
             qty_calc = subtotal_factura / subtotal_oc * line.product_qty
-            res["quantity"] = round(qty_calc, 4)
+            res["quantity"] = qty_calc
 
         return res
+
