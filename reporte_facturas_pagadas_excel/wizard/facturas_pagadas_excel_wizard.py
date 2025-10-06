@@ -127,7 +127,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 else:
                     monto_pagado = amount_in_pay_cur
 
-                monto_pagado_mxn = pago_currency._convert(monto_pagado, mxn, company, fecha_pago or fecha_factura)
+                monto_pagado_mxn = pago_currency.amount_company_currency_signed
 
                 c = 0
                 sheet.write(row, c, folio); c += 1
