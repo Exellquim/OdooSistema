@@ -17,3 +17,4 @@ class AccountMoveLine(models.Model):
                 if price_unit and subtotal:
                     new_qty = subtotal / price_unit
                     line.quantity = new_qty
+
