@@ -63,11 +63,9 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             moneda_factura = inv.currency_id and inv.currency_id.name or ''
             total_factura = inv.amount_total
 
-            
             subtotal_mxn = inv.amount_untaxed_signed
             impuesto_mxn = inv.amount_tax_signed
             total_mxn = inv.amount_total_signed
-    # ========================================================================
 
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
@@ -112,11 +110,15 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 row += 1
                 continue
 
+            # ------------------------
+            # Pagos válidos
+            # ------------------------
             for m, pay_ml, pay_move, pago, folio_pago in pagos_validos:
                 fecha_pago = (pago and pago.date) or pay_move.date
                 pago_currency = pay_ml.currency_id or company.currency_id
                 moneda_pago = pago_currency.name
 
+                # Determinar monto en la moneda del pago
                 if pay_ml.id == m.credit_move_id.id:
                     amount_in_pay_cur = abs(m.credit_amount_currency or 0.0)
                 else:
@@ -127,7 +129,8 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 else:
                     monto_pagado = amount_in_pay_cur
 
-                monto_pagado_mxn = pago_currency.amount_company_currency_signed
+                # En moneda de la compañía (MXN normalmente)
+                monto_pagado_mxn = abs(pay_ml.balance or 0.0)
 
                 c = 0
                 sheet.write(row, c, folio); c += 1
