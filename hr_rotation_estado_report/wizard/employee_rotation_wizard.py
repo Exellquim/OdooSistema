@@ -39,7 +39,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
         Incluye activos y archivados (active_test=False).
         """
         self = self.with_context(active_test=False)
-        _, next_month_start, _ = _month_bounds(day)
+        _, next_month_start, mend = _month_bounds(day)
         domain = [
             ("create_date", "<", datetime.combine(next_month_start, datetime.min.time())),
             "|",
@@ -59,10 +59,10 @@ class EmployeeRotationReportWizard(models.TransientModel):
 
     @api.model
     def _group_count_by_estado(self, records):
-        """Group list of dicts by ESTADO_FIELD. Empty -> 'Sin Estado'."""
+        """Agrupar por estado; si está vacío, mostrar como 'Sin Estado' en el reporte."""
         counts = {}
         for rec in records:
-            key = rec.get(ESTADO_FIELD) or _("Sin Estado")
+            key = rec.get(ESTADO_FIELD) or "Sin Estado"
             counts[key] = counts.get(key, 0) + 1
         return counts
 
@@ -107,6 +107,30 @@ class EmployeeRotationReportWizard(models.TransientModel):
         action["domain"] = [("wizard_id", "=", self.id)]
         return action
 
+    def action_view_archived_employees(self, estado=None):
+        """Ver empleados archivados en el mes (y opcionalmente por estado)."""
+        self.ensure_one()
+        mstart, nstart, mend = _month_bounds(self.target_month)
+
+        domain = [
+            ("departure_date", ">=", mstart),
+            ("departure_date", "<", nstart),
+        ]
+        if estado:
+            if estado == "Sin Estado":
+                domain.append((ESTADO_FIELD, "=", False))
+            else:
+                domain.append((ESTADO_FIELD, "=", estado))
+
+        return {
+            "name": _("Empleados Rotación"),
+            "type": "ir.actions.act_window",
+            "res_model": "hr.employee",
+            "view_mode": "tree,form",
+            "domain": domain,
+            "context": {"active_test": False},  
+        }
+
 
 class EmployeeRotationReportLine(models.TransientModel):
     _name = "employee.rotation.report.line"
@@ -116,7 +140,7 @@ class EmployeeRotationReportLine(models.TransientModel):
     wizard_id = fields.Many2one("employee.rotation.report.wizard", ondelete="cascade")
 
     estado = fields.Char(string="Estado del empleado", required=True, index=True)
-    fecha = fields.Date(string="Fecha", required=True)  # <-- NUEVO
+    fecha = fields.Date(string="Fecha", required=True)
     inicio = fields.Integer(string="Inicio", required=True, default=0)
     fin = fields.Integer(string="Fin", required=True, default=0)
     rotacion = fields.Integer(string="Rotacion", required=True, default=0)
@@ -125,12 +149,16 @@ class EmployeeRotationReportLine(models.TransientModel):
     porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
                               help="Rotacion / Ingreso * 100")
     porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
-    fecha = fields.Date(string="Fecha", required=True)
     mes_nombre = fields.Char(
         string="Mes",
         compute='_compute_mes_nombre',
-        store=False,   # pon True si quieres guardar y poder agrupar/ordenar
+        store=False,
     )
+
+    def action_open_archived_employees(self):
+        """Abrir empleados archivados para esta línea (mes + estado)."""
+        self.ensure_one()
+        return self.wizard_id.action_view_archived_employees(self.estado)
 
     @api.depends('fecha')
     def _compute_mes_nombre(self):
@@ -143,17 +171,8 @@ class EmployeeRotationReportLine(models.TransientModel):
             else:
                 rec.mes_nombre = False
 
-
-    
     @api.depends("porcentaje")
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
-
-
-
-
-
-
-
 
