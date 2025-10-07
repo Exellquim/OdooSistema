@@ -29,6 +29,10 @@
                 <field name="rotacion"/>
                 <field name="ingreso"/>
                 <field name="porcentaje_txt"/>
+                <button name="action_open_archived_employees"
+            type="object"
+            icon="fa-eye"
+            title="Empleados Rotación"/>
             </tree>
         </field>
     </record>
