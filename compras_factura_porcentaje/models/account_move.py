@@ -5,8 +5,11 @@ class PurchaseOrderLine(models.Model):
 
     @api.depends('invoice_lines.move_id.state', 'invoice_lines.price_subtotal')
     def _compute_qty_invoiced(self):
-        """Permite facturar parcialmente hasta completar el total de la OC
-           Solo aplica para facturas de proveedores (in_invoice)"""
+        """
+        Permite facturar parcialmente hasta completar el total de la OC
+        Solo aplica para facturas de proveedores (in_invoice).
+        El qty_invoiced reflejará el porcentaje facturado (0.0 - 1.0)
+        """
         super()._compute_qty_invoiced()
 
         for line in self:
@@ -18,13 +21,13 @@ class PurchaseOrderLine(models.Model):
                 inv_line.price_subtotal
                 for inv_line in line.invoice_lines
                 if inv_line.move_id.state != 'cancel'
-                and inv_line.move_id.move_type == 'in_invoice'  # Solo proveedor
+                and inv_line.move_id.move_type == 'in_invoice'
             )
 
-            if total_facturado > 0 and line.price_unit > 0:
-                # Convertir monto facturado a cantidad facturada
-                qty_facturada = total_facturado / line.price_unit
-                # No permitir superar lo comprado
-                line.qty_invoiced = min(qty_facturada, line.product_qty)
+            if total_facturado > 0 and total_oc > 0:
+                # Calcular porcentaje facturado
+                porcentaje = total_facturado / total_oc
+                # No permitir que supere 1 (100%)
+                line.qty_invoiced = min(porcentaje, 1.0)
             else:
-                line.qty_invoiced = 0
+                line.qty_invoiced = 0.0
