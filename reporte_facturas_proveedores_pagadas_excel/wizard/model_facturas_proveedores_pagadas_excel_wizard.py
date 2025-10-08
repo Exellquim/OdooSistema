@@ -5,7 +5,7 @@ import xlsxwriter
 
 
 class FacturasProveedoresExcelWizard(models.TransientModel):
-    _name = 'facturas.proveedores.excel.wizard'
+    _name = 'facturas.proveedores.pagadas.excel.wizard'
     _description = 'Exportar reporte de facturas de proveedores a Excel'
 
     date_start = fields.Date(string='Desde')
@@ -176,3 +176,4 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                    % (self._name, self.id, self.file_name),
             'target': 'self',
         }
+
