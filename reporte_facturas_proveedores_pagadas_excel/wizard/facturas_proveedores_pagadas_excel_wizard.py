@@ -8,12 +8,15 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
     _name = 'facturas.proveedores.pagadas.excel.wizard'
     _description = 'Exportar reporte de facturas de proveedores pagadas a Excel'
 
+
     company_id = fields.Many2one(
         'res.company',
         string='Compañía',
         required=True,
-        default=lambda self: self.env.company
+        default=lambda self: self.env.company,
+        readonly=True
     )
+
     date_start = fields.Date(string='Desde')
     date_end = fields.Date(string='Hasta')
     file = fields.Binary('Archivo Excel', readonly=True)
@@ -101,3 +104,4 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                    % (self._name, self.id, self.file_name),
             'target': 'self',
         }
+
