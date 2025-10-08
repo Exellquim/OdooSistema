@@ -24,7 +24,6 @@
     <field name="target">new</field>
   </record>
 
-  <!-- Menú directo en Informes -->
   <menuitem id="menu_facturas_proveedores_pagadas_excel"
             name="Facturas de Proveedores Pagadas Excel"
             parent="account.menu_finance_reports"
