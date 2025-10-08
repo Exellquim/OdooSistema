@@ -35,15 +35,16 @@ class PurchaseOrderLine(models.Model):
                 line.porcentaje_invoiced = 0.0
                 line.qty_invoiced = 0.0
 
-    def _prepare_account_move_line(self, move):
+    def _prepare_account_move_line(self, move=False):
         """
         Facturación parcial desde OC:
         - cantidad proporcional pendiente
         - precio unitario fijo = precio de la OC
+        Solo aplica en facturas de proveedor (in_invoice)
         """
         res = super()._prepare_account_move_line(move)
 
-        if move.move_type == 'in_invoice' and self.price_unit > 0:
+        if move and move.move_type == 'in_invoice' and self.price_unit > 0:
             total_oc = self.price_unit * self.product_qty
 
             # Total ya facturado
