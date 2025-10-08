@@ -1,1 +1,1 @@
-from . import facturas_proveedores_excel_wizard
+from . import facturas_proveedores_pagadas_excel_wizard
