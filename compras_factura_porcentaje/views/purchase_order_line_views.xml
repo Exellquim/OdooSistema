@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_percentage" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.percentage</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Insertamos el campo en las líneas de la orden de compra -->
+            <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="after">
+                <field name="porcentaje_invoiced" widget="float_factor" digits="[16,2]"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form/field[@name='qty_invoiced']" position="after">
+                <field name="porcentaje_invoiced" widget="float_factor" digits="[16,2]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
