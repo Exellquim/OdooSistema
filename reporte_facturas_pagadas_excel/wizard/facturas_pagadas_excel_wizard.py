@@ -4,27 +4,27 @@ import io
 import xlsxwriter
 
 
-class FacturasPagadasExcelWizard(models.TransientModel):
-    _name = 'facturas.pagadas.excel.wizard'
-    _description = 'Exportar reporte de facturas pagadas a Excel'
+class FacturasProveedoresExcelWizard(models.TransientModel):
+    _name = 'facturas.proveedores.excel.wizard'
+    _description = 'Exportar reporte de facturas de proveedores a Excel'
 
     date_start = fields.Date(string='Desde')
     date_end = fields.Date(string='Hasta')
     file = fields.Binary('Archivo Excel', readonly=True)
-    file_name = fields.Char('Nombre del archivo', default='facturas_pagadas.xlsx', readonly=True)
+    file_name = fields.Char('Nombre del archivo', default='facturas_proveedores.xlsx', readonly=True)
 
     def exportar_excel(self):
         self.ensure_one()
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet('Facturas Pagadas')
+        sheet = workbook.add_worksheet('Facturas Proveedores')
 
         bold = workbook.add_format({'bold': True})
         money = workbook.add_format({'num_format': '#,##0.00'})
         datefmt = workbook.add_format({'num_format': 'yyyy-mm-dd'})
 
         headers = [
-            'Folio Factura', 'UUID', 'Cliente', 'RFC', 'País',
+            'Folio Factura', 'UUID', 'Proveedor', 'RFC', 'País',
             'Fecha Factura', 'Moneda de Factura', 'Total Factura',
             'Subtotal Conversion', 'Impuesto Conversion', 'Total Factura Conversion',
             'Monto Pendiente', 'Estado Pago', 'Folio Pago',
@@ -33,8 +33,8 @@ class FacturasPagadasExcelWizard(models.TransientModel):
         for col, h in enumerate(headers):
             sheet.write(0, col, h, bold)
 
-        # Dominio: facturas de venta / NC, posteadas; opcionalmente por fecha de factura
-        domain = [('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '=', 'posted')]
+        # Dominio: facturas de proveedor (compras), posteadas; opcionalmente por fecha
+        domain = [('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted')]
         if self.date_start:
             domain.append(('invoice_date', '>=', self.date_start))
         if self.date_end:
@@ -44,7 +44,6 @@ class FacturasPagadasExcelWizard(models.TransientModel):
 
         row = 1
         company = self.env.company
-        mxn = self.env.ref('base.MXN')
 
         for inv in invoices:
             folio = inv.name or ''
@@ -55,7 +54,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                     uuid = uuids[0]
 
             partner = inv.partner_id
-            cliente = partner.display_name or ''
+            proveedor = partner.display_name or ''
             rfc = partner.vat or ''
             pais = partner.country_id.name if partner.country_id else ''
             fecha_factura = inv.invoice_date or inv.date or fields.Date.context_today(self)
@@ -70,10 +69,10 @@ class FacturasPagadasExcelWizard(models.TransientModel):
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
 
-            receivables = inv.line_ids.filtered(
-                lambda l: l.account_id.account_type in ('asset_receivable', 'liability_payable')
+            payables = inv.line_ids.filtered(
+                lambda l: l.account_id.account_type in ('liability_payable', 'asset_receivable')
             )
-            matched_parts = (receivables.mapped('matched_debit_ids') | receivables.mapped('matched_credit_ids'))
+            matched_parts = (payables.mapped('matched_debit_ids') | payables.mapped('matched_credit_ids'))
 
             pagos_validos = []
             for m in matched_parts:
@@ -91,7 +90,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 c = 0
                 sheet.write(row, c, folio); c += 1
                 sheet.write(row, c, uuid); c += 1
-                sheet.write(row, c, cliente); c += 1
+                sheet.write(row, c, proveedor); c += 1
                 sheet.write(row, c, rfc); c += 1
                 sheet.write(row, c, pais); c += 1
                 sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
@@ -102,11 +101,11 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 sheet.write_number(row, c, total_mxn, money); c += 1
                 sheet.write_number(row, c, monto_pendiente, money); c += 1
                 sheet.write(row, c, estado_pago); c += 1
-                sheet.write(row, c, ''); c += 1  # Folio Pago
-                sheet.write(row, c, ''); c += 1  # Fecha Pago
-                sheet.write(row, c, ''); c += 1  # Moneda pago
-                sheet.write(row, c, ''); c += 1  # Monto pagado
-                sheet.write(row, c, ''); c += 1  # Monto pagado MXN
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
                 row += 1
                 continue
 
@@ -118,7 +117,6 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 pago_currency = pay_ml.currency_id or company.currency_id
                 moneda_pago = pago_currency.name
 
-                # Determinar monto en la moneda del pago
                 if pay_ml.id == m.credit_move_id.id:
                     amount_in_pay_cur = abs(m.credit_amount_currency or 0.0)
                 else:
@@ -129,13 +127,12 @@ class FacturasPagadasExcelWizard(models.TransientModel):
                 else:
                     monto_pagado = amount_in_pay_cur
 
-                # En moneda de la compañía (MXN normalmente)
                 monto_pagado_mxn = abs(pay_ml.balance or 0.0)
 
                 c = 0
                 sheet.write(row, c, folio); c += 1
                 sheet.write(row, c, uuid); c += 1
-                sheet.write(row, c, cliente); c += 1
+                sheet.write(row, c, proveedor); c += 1
                 sheet.write(row, c, rfc); c += 1
                 sheet.write(row, c, pais); c += 1
                 sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
@@ -171,7 +168,7 @@ class FacturasPagadasExcelWizard(models.TransientModel):
         data = output.read()
         self.write({
             'file': base64.b64encode(data),
-            'file_name': 'facturas_pagadas.xlsx',
+            'file_name': 'facturas_proveedores.xlsx',
         })
         return {
             'type': 'ir.actions.act_url',
