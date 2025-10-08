@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 
+
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
@@ -34,6 +35,34 @@ class PurchaseOrderLine(models.Model):
                 line.porcentaje_invoiced = 0.0
                 line.qty_invoiced = 0.0
 
+    def _prepare_account_move_line(self, move):
+        """
+        Facturación parcial desde OC:
+        - cantidad proporcional pendiente
+        - precio unitario fijo = precio de la OC
+        """
+        res = super()._prepare_account_move_line(move)
+
+        if move.move_type == 'in_invoice' and self.price_unit > 0:
+            total_oc = self.price_unit * self.product_qty
+
+            # Total ya facturado
+            total_facturado = sum(
+                inv_line.price_subtotal
+                for inv_line in self.invoice_lines
+                if inv_line.move_id.state != 'cancel'
+                and inv_line.move_id.move_type == 'in_invoice'
+            )
+
+            pendiente = total_oc - total_facturado
+            if pendiente > 0:
+                qty_pendiente = pendiente / self.price_unit
+                res.update({
+                    "quantity": qty_pendiente,
+                    "price_unit": self.price_unit,
+                })
+        return res
+
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
@@ -41,13 +70,36 @@ class PurchaseOrder(models.Model):
     def _get_invoiceable_lines(self, final=False):
         """
         Permitir facturación parcial basada en porcentaje,
-        aunque la política del producto sea 'cantidad recibida'.
+        aunque la política de facturación del producto sea 'cantidad recibida'.
         """
         res = super()._get_invoiceable_lines(final=final)
         for order in self:
             for line in order.order_line:
-                # Si la línea aún no está facturada por completo, la hacemos facturable
                 if line.product_id and line.qty_invoiced < line.product_qty:
                     if line not in res:
                         res |= line
         return res
+
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    @api.onchange('price_unit')
+    def _onchange_price_unit_keep_oc_price(self):
+        """
+        Si en una factura de proveedor (in_invoice) el usuario cambia el price_unit:
+        - recalcula la cantidad proporcional
+        - restablece el precio unitario al de la OC
+        """
+        for line in self:
+            move = line.move_id
+            purchase_line = line.purchase_line_id
+
+            if move.move_type == 'in_invoice' and purchase_line and purchase_line.price_unit > 0:
+                price_oc = purchase_line.price_unit
+
+                # cantidad proporcional = nuevo precio escrito ÷ precio OC
+                qty_proporcional = line.price_unit / price_oc
+
+                line.quantity = qty_proporcional
+                line.price_unit = price_oc
