@@ -5,7 +5,7 @@
     <field name="arch" type="xml">
       <form string="Exportar Facturas de Proveedores Pagadas">
         <group>
-          <field name="company_id"/>
+          <field name="company_id" readonly="1"/>
           <field name="date_start"/>
           <field name="date_end"/>
         </group>
@@ -30,3 +30,4 @@
             action="action_facturas_proveedores_pagadas_excel_wizard"
             sequence="50"/>
 </odoo>
+
