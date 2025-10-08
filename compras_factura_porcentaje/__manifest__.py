@@ -5,7 +5,10 @@
     "category": "Purchases",
     "author": "RADAX-HEPL2025",
     "depends": ["purchase", "account"],
-    "data": [],
+    'data': [
+        'views/purchase_order_line_views.xml',
+    ],
     "installable": True,
     "application": False,
 }
+
