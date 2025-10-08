@@ -6,12 +6,11 @@ class PurchaseOrderLine(models.Model):
     @api.depends('invoice_lines.move_id.state', 'invoice_lines.price_subtotal')
     def _compute_qty_invoiced(self):
         """Extiende el cálculo estándar y lo ajusta a porcentaje"""
-        super()._compute_qty_invoiced()  # primero deja que Odoo haga lo suyo
+        super()._compute_qty_invoiced()  
 
         for line in self:
             total_oc = line.price_unit * line.product_qty
 
-            # sumar subtotales de facturas confirmadas (posted)
             total_facturado = sum(
                 inv_line.price_subtotal
                 for inv_line in line.invoice_lines
@@ -20,6 +19,5 @@ class PurchaseOrderLine(models.Model):
             )
 
             if total_oc > 0 and total_facturado > 0:
-                # porcentaje de lo facturado vs lo esperado
                 porcentaje = total_facturado / total_oc
                 line.qty_invoiced = round(porcentaje, 4)
