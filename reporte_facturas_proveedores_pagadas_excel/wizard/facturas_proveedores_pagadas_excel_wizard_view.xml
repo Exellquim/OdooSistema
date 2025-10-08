@@ -24,14 +24,10 @@
     <field name="target">new</field>
   </record>
 
-  <menuitem id="menu_excel_report_root_proveedores"
-            name="Reportes Excel Proveedores"
-            parent="account.menu_finance_reports"
-            sequence="11"/>
-
+  <!-- Menú directo en Informes -->
   <menuitem id="menu_facturas_proveedores_pagadas_excel"
             name="Facturas de Proveedores Pagadas Excel"
-            parent="menu_excel_report_root_proveedores"
+            parent="account.menu_finance_reports"
             action="action_facturas_proveedores_pagadas_excel_wizard"
-            sequence="1"/>
+            sequence="50"/>
 </odoo>
