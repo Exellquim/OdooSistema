@@ -68,11 +68,12 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
 
-            # Pagos relacionados (Odoo trae esta función lista)
-            pagos = inv._get_reconciled_info_JSON_values()
+            # Buscar pagos relacionados a la factura
+            payments = inv.line_ids.mapped('matched_debit_ids.debit_move_id.move_id') | \
+                       inv.line_ids.mapped('matched_credit_ids.credit_move_id.move_id')
 
-            if pagos:
-                for pago in pagos:
+            if payments:
+                for pago in payments:
                     c = 0
                     sheet.write(row, c, folio); c += 1
                     sheet.write(row, c, uuid); c += 1
@@ -89,19 +90,18 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                     sheet.write(row, c, estado_pago); c += 1
 
                     # Datos del pago
-                    sheet.write(row, c, pago.get('move_name', '')); c += 1
-                    fecha_pago = pago.get('date')
-                    if fecha_pago:
-                        sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_pago), datefmt)
+                    sheet.write(row, c, pago.name or ''); c += 1
+                    if pago.date:
+                        sheet.write_datetime(row, c, fields.Datetime.to_datetime(pago.date), datefmt)
                     else:
                         sheet.write(row, c, '')
                     c += 1
-                    sheet.write(row, c, pago.get('currency', '')); c += 1
-                    sheet.write_number(row, c, pago.get('amount', 0.0), money); c += 1
-                    sheet.write_number(row, c, pago.get('amount_company_currency', 0.0), money); c += 1
+                    sheet.write(row, c, pago.currency_id.name or ''); c += 1
+                    sheet.write_number(row, c, pago.amount_total, money); c += 1
+                    sheet.write_number(row, c, pago.amount_total_signed, money); c += 1
                     row += 1
             else:
-                # Si no tiene pagos, igual escribimos la fila vacía
+                # Si no tiene pagos, fila vacía en columnas de pago
                 c = 0
                 sheet.write(row, c, folio); c += 1
                 sheet.write(row, c, uuid); c += 1
