@@ -98,8 +98,20 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                         sheet.write(row, c, '')
                     c += 1
                     sheet.write(row, c, pago.currency_id.name or ''); c += 1
-                    sheet.write_number(row, c, pago.amount_signed, money); c += 1
-                    sheet.write_number(row, c, pago.amount_total_signed, money); c += 1
+
+                    # 🔑 Calcular monto pagado aplicado a esta factura
+                    monto_pagado = 0.0
+                    for line in inv.line_ids:
+                        for partial in line.matched_debit_ids:
+                            if partial.debit_move_id.move_id == pago:
+                                monto_pagado += partial.amount
+                        for partial in line.matched_credit_ids:
+                            if partial.credit_move_id.move_id == pago:
+                                monto_pagado += partial.amount
+
+                    # Escribir montos
+                    sheet.write_number(row, c, monto_pagado, money); c += 1
+                    sheet.write_number(row, c, monto_pagado, money); c += 1
                     row += 1
             else:
                 # Si no tiene pagos válidos, fila vacía en columnas de pago
@@ -137,4 +149,3 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                    % (self._name, self.id, self.file_name),
             'target': 'self',
         }
-
