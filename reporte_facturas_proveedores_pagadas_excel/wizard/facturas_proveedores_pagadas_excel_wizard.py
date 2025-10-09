@@ -98,7 +98,7 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                         sheet.write(row, c, '')
                     c += 1
                     sheet.write(row, c, pago.currency_id.name or ''); c += 1
-                    sheet.write_number(row, c, pago.amount_total, money); c += 1
+                    sheet.write_number(row, c, pago.amount_signed, money); c += 1
                     sheet.write_number(row, c, pago.amount_total_signed, money); c += 1
                     row += 1
             else:
@@ -137,3 +137,4 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                    % (self._name, self.id, self.file_name),
             'target': 'self',
         }
+
