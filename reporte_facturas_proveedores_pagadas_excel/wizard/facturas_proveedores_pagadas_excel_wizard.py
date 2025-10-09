@@ -8,7 +8,6 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
     _name = 'facturas.proveedores.pagadas.excel.wizard'
     _description = 'Exportar reporte de facturas de proveedores pagadas a Excel'
 
-
     company_id = fields.Many2one(
         'res.company',
         string='Compañía',
@@ -52,7 +51,6 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
         invoices = self.env['account.move'].search(domain, order='invoice_date,id')
 
         row = 1
-        company = self.env.company
 
         for inv in invoices:
             folio = inv.name or ''
@@ -70,26 +68,60 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
 
-            c = 0
-            sheet.write(row, c, folio); c += 1
-            sheet.write(row, c, uuid); c += 1
-            sheet.write(row, c, proveedor); c += 1
-            sheet.write(row, c, rfc); c += 1
-            sheet.write(row, c, pais); c += 1
-            sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
-            sheet.write(row, c, moneda_factura); c += 1
-            sheet.write_number(row, c, total_factura, money); c += 1
-            sheet.write_number(row, c, subtotal_mxn, money); c += 1
-            sheet.write_number(row, c, impuesto_mxn, money); c += 1
-            sheet.write_number(row, c, total_mxn, money); c += 1
-            sheet.write_number(row, c, monto_pendiente, money); c += 1
-            sheet.write(row, c, estado_pago); c += 1
-            sheet.write(row, c, ''); c += 1
-            sheet.write(row, c, ''); c += 1
-            sheet.write(row, c, ''); c += 1
-            sheet.write(row, c, ''); c += 1
-            sheet.write(row, c, ''); c += 1
-            row += 1
+            # Pagos relacionados (Odoo trae esta función lista)
+            pagos = inv._get_reconciled_info_JSON_values()
+
+            if pagos:
+                for pago in pagos:
+                    c = 0
+                    sheet.write(row, c, folio); c += 1
+                    sheet.write(row, c, uuid); c += 1
+                    sheet.write(row, c, proveedor); c += 1
+                    sheet.write(row, c, rfc); c += 1
+                    sheet.write(row, c, pais); c += 1
+                    sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
+                    sheet.write(row, c, moneda_factura); c += 1
+                    sheet.write_number(row, c, total_factura, money); c += 1
+                    sheet.write_number(row, c, subtotal_mxn, money); c += 1
+                    sheet.write_number(row, c, impuesto_mxn, money); c += 1
+                    sheet.write_number(row, c, total_mxn, money); c += 1
+                    sheet.write_number(row, c, monto_pendiente, money); c += 1
+                    sheet.write(row, c, estado_pago); c += 1
+
+                    # Datos del pago
+                    sheet.write(row, c, pago.get('move_name', '')); c += 1
+                    fecha_pago = pago.get('date')
+                    if fecha_pago:
+                        sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_pago), datefmt)
+                    else:
+                        sheet.write(row, c, '')
+                    c += 1
+                    sheet.write(row, c, pago.get('currency', '')); c += 1
+                    sheet.write_number(row, c, pago.get('amount', 0.0), money); c += 1
+                    sheet.write_number(row, c, pago.get('amount_company_currency', 0.0), money); c += 1
+                    row += 1
+            else:
+                # Si no tiene pagos, igual escribimos la fila vacía
+                c = 0
+                sheet.write(row, c, folio); c += 1
+                sheet.write(row, c, uuid); c += 1
+                sheet.write(row, c, proveedor); c += 1
+                sheet.write(row, c, rfc); c += 1
+                sheet.write(row, c, pais); c += 1
+                sheet.write_datetime(row, c, fields.Datetime.to_datetime(fecha_factura), datefmt); c += 1
+                sheet.write(row, c, moneda_factura); c += 1
+                sheet.write_number(row, c, total_factura, money); c += 1
+                sheet.write_number(row, c, subtotal_mxn, money); c += 1
+                sheet.write_number(row, c, impuesto_mxn, money); c += 1
+                sheet.write_number(row, c, total_mxn, money); c += 1
+                sheet.write_number(row, c, monto_pendiente, money); c += 1
+                sheet.write(row, c, estado_pago); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                sheet.write(row, c, ''); c += 1
+                row += 1
 
         workbook.close()
         output.seek(0)
@@ -104,4 +136,3 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                    % (self._name, self.id, self.file_name),
             'target': 'self',
         }
-
