@@ -68,9 +68,10 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
             monto_pendiente = inv.amount_residual
             estado_pago = dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)
 
-            # Buscar pagos relacionados a la factura
+            # Buscar pagos relacionados a la factura (excluyendo los CBMX)
             payments = inv.line_ids.mapped('matched_debit_ids.debit_move_id.move_id') | \
                        inv.line_ids.mapped('matched_credit_ids.credit_move_id.move_id')
+            payments = payments.filtered(lambda p: not (p.name and 'CBMX' in p.name))
 
             if payments:
                 for pago in payments:
@@ -101,7 +102,7 @@ class FacturasProveedoresExcelWizard(models.TransientModel):
                     sheet.write_number(row, c, pago.amount_total_signed, money); c += 1
                     row += 1
             else:
-                # Si no tiene pagos, fila vacía en columnas de pago
+                # Si no tiene pagos válidos, fila vacía en columnas de pago
                 c = 0
                 sheet.write(row, c, folio); c += 1
                 sheet.write(row, c, uuid); c += 1
