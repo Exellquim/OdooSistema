@@ -53,7 +53,6 @@
 
     <!-- Acción principal -->
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
-        <field name="groups_id" eval="[(6,0,[ref('proceso_seleccion.group_rrhh_employee')])]"/>
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
         <field name="view_mode">tree,graph</field>
@@ -64,7 +63,6 @@
 
     <!-- Acción para abrir el wizard -->
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
-        <field name="groups_id" eval="[(6,0,[ref('proceso_seleccion.group_rrhh_employee')])]"/>
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
         <field name="view_mode">form</field>
