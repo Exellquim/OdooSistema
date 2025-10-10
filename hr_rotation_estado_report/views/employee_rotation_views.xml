@@ -53,39 +53,28 @@
 
     <!-- Acción principal -->
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
+        <field name="groups_id" eval="[(6,0,[ref('proceso_seleccion.group_rrhh_employee')])]"/>
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
         <field name="view_mode">tree,graph</field>
         <field name="help" type="html">
             <p>Tabla y gráfica de rotación por estado del empleado para el mes elegido.</p>
         </field>
-        <!-- 🔑 Solo grupo RRHH -->
-        <field name="groups_id" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user'))]"/>
     </record>
 
-    <!-- Acción Wizard -->
+    <!-- Acción para abrir el wizard -->
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
+        <field name="groups_id" eval="[(6,0,[ref('proceso_seleccion.group_rrhh_employee')])]"/>
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_employee_rotation_report_wizard_form"/>
         <field name="target">new</field>
-        <!-- 🔑 Solo grupo RRHH -->
-        <field name="groups_id" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user'))]"/>
     </record>
     
     <!-- Menús -->
-    <menuitem id="menu_hr_rotation_root"
-              name="Reportes RH"
-              parent="hr.menu_hr_root"
-              sequence="95"
-              groups="hr_recruitment.group_hr_recruitment_user"/>
-
-    <menuitem id="menu_hr_rotation_wizard"
-              name="Rotación por Estado"
-              parent="menu_hr_rotation_root"
-              action="action_employee_rotation_wizard"
-              sequence="10"
-              groups="hr_recruitment.group_hr_recruitment_user"/>
+    <menuitem id="menu_hr_rotation_root" name="Reportes RH" parent="hr.menu_hr_root" sequence="95"/>
+    <menuitem id="menu_hr_rotation_wizard" name="Rotación por Estado"
+              parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
