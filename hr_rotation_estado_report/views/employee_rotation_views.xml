@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+    <!-- Wizard -->
     <record id="view_employee_rotation_report_wizard_form" model="ir.ui.view">
         <field name="name">employee.rotation.report.wizard.form</field>
         <field name="model">employee.rotation.report.wizard</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Tree de resultados con icono -->
     <record id="view_employee_rotation_line_tree" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.tree</field>
         <field name="model">employee.rotation.report.line</field>
@@ -37,6 +39,7 @@
         </field>
     </record>
 
+    <!-- Gráfico -->
     <record id="view_employee_rotation_line_graph" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.graph</field>
         <field name="model">employee.rotation.report.line</field>
@@ -48,7 +51,7 @@
         </field>
     </record>
 
-    
+    <!-- Acción principal -->
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
@@ -58,7 +61,7 @@
         </field>
     </record>
 
-    
+    <!-- Menús -->
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
@@ -72,5 +75,7 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
+
+
 
 
