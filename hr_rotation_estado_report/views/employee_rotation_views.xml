@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Wizard -->
+    <!-- Vista del wizard -->
     <record id="view_employee_rotation_report_wizard_form" model="ir.ui.view">
         <field name="name">employee.rotation.report.wizard.form</field>
         <field name="model">employee.rotation.report.wizard</field>
@@ -18,7 +18,7 @@
         </field>
     </record>
 
-    <!-- Tree de resultados con icono -->
+    <!-- Vista tree de resultados -->
     <record id="view_employee_rotation_line_tree" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.tree</field>
         <field name="model">employee.rotation.report.line</field>
@@ -32,14 +32,14 @@
                 <field name="ingreso"/>
                 <field name="porcentaje_txt"/>
                 <button name="action_open_archived_employees"
-            type="object"
-            icon="fa-eye"
-            title="Empleados Rotación"/>
+                        type="object"
+                        icon="fa-eye"
+                        title="Empleados Rotación"/>
             </tree>
         </field>
     </record>
 
-    <!-- Gráfico -->
+    <!-- Vista gráfica -->
     <record id="view_employee_rotation_line_graph" model="ir.ui.view">
         <field name="name">employee.rotation.report.line.graph</field>
         <field name="model">employee.rotation.report.line</field>
@@ -51,7 +51,7 @@
         </field>
     </record>
 
-    <!-- Acción principal -->
+    <!-- Acción para ver resultados -->
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
@@ -59,23 +59,33 @@
         <field name="help" type="html">
             <p>Tabla y gráfica de rotación por estado del empleado para el mes elegido.</p>
         </field>
+        <!-- Permitir acceso a usuarios internos -->
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
-    <!-- Menús -->
+    <!-- Acción para abrir el wizard -->
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_employee_rotation_report_wizard_form"/>
         <field name="target">new</field>
+        <!-- Permitir acceso a usuarios internos -->
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
     </record>
     
-    <menuitem id="menu_hr_rotation_root" name="Reportes RH" parent="hr.menu_hr_root" sequence="95"/>
-    <menuitem id="menu_hr_rotation_wizard" name="Rotación por Estado"
-              parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
+    <!-- Menús -->
+    <menuitem id="menu_hr_rotation_root"
+              name="Reportes RH"
+              parent="hr.menu_hr_root"
+              sequence="95"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_hr_rotation_wizard"
+              name="Rotación por Estado"
+              parent="menu_hr_rotation_root"
+              action="action_employee_rotation_wizard"
+              sequence="10"
+              groups="base.group_user"/>
 
 </odoo>
-
-
-
-
