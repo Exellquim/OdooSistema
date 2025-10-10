@@ -7,10 +7,11 @@
   'author': 'Tu Organización',
   'depends': ['hr', 'web'],
   'data': [
-    #'security/ir.model.access.csv',
+    'security/ir.model.access.csv',
     'views/employee_rotation_views.xml',
   ],
   'installable': True,
   'application': False,
 }
+
 
