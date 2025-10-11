@@ -30,9 +30,9 @@
                 <field name="ingreso"/>
                 <field name="porcentaje_txt"/>
                 <button name="action_open_archived_employees"
-            type="object"
-            icon="fa-eye"
-            title="Empleados Rotación"/>
+                        type="object"
+                        icon="fa-eye"
+                        title="Empleados Rotación"/>
             </tree>
         </field>
     </record>
@@ -48,7 +48,6 @@
         </field>
     </record>
 
-    
     <record id="action_employee_rotation_lines" model="ir.actions.act_window">
         <field name="name">Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.line</field>
@@ -58,7 +57,6 @@
         </field>
     </record>
 
-    
     <record id="action_employee_rotation_wizard" model="ir.actions.act_window">
         <field name="name">Reporte de Rotación por Estado</field>
         <field name="res_model">employee.rotation.report.wizard</field>
@@ -72,6 +70,3 @@
               parent="menu_hr_rotation_root" action="action_employee_rotation_wizard" sequence="10"/>
 
 </odoo>
-
-
-
