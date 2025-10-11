@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
-from odoo.tools.misc import format_date 
+from odoo.tools.misc import format_date
 from odoo import api, fields, models, _
 
-ESTADO_FIELD = "x_studio_estado_del_empleado"  
+ESTADO_FIELD = "x_studio_estado_del_empleado"
 
 
 def _month_bounds(any_day: date):
@@ -35,7 +34,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
         Empleados presentes al cierre de 'day'.
         Criterio:
           - create_date < primer_dia_mes_siguiente(day)
-          - departure_date vacio o > day
+          - departure_date vacío o > day
         Incluye activos y archivados (active_test=False).
         """
         self = self.with_context(active_test=False)
@@ -67,6 +66,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
         return counts
 
     def action_compute(self):
+        """Calcula los valores de rotación y abre la vista de resultados."""
         self.ensure_one()
         self.line_ids.unlink()
 
@@ -91,11 +91,11 @@ class EmployeeRotationReportWizard(models.TransientModel):
             rot = rot_by_estado.get(estado, 0)
             ingreso = (inicio + fin) / 2.0
             porcentaje = (rot / ingreso * 100.0) if ingreso else 0.0
-            
+
             Line.create({
                 "wizard_id": self.id,
                 "estado": estado,
-                "fecha": mend,      
+                "fecha": mend,
                 "inicio": inicio,
                 "fin": fin,
                 "rotacion": rot,
@@ -103,7 +103,9 @@ class EmployeeRotationReportWizard(models.TransientModel):
                 "porcentaje": porcentaje,
             })
 
-        action = self.env.ref("hr_rotation_estado_report.action_employee_rotation_lines").read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(
+            "hr_rotation_estado_report.action_employee_rotation_lines"
+        )
         action["domain"] = [("wizard_id", "=", self.id)]
         return action
 
@@ -128,7 +130,7 @@ class EmployeeRotationReportWizard(models.TransientModel):
             "res_model": "hr.employee",
             "view_mode": "tree,form",
             "domain": domain,
-            "context": {"active_test": False},  
+            "context": {"active_test": False},
         }
 
 
@@ -144,10 +146,14 @@ class EmployeeRotationReportLine(models.TransientModel):
     inicio = fields.Integer(string="Inicio", required=True, default=0)
     fin = fields.Integer(string="Fin", required=True, default=0)
     rotacion = fields.Integer(string="Rotacion", required=True, default=0)
-    ingreso = fields.Float(string="Ingreso", digits=(16, 2), required=True, default=0.0,
-                           help="(Inicio + Fin) / 2")
-    porcentaje = fields.Float(string="Porcentaje", digits=(16, 2), required=True, default=0.0,
-                              help="Rotacion / Ingreso * 100")
+    ingreso = fields.Float(
+        string="Ingreso", digits=(16, 2), required=True, default=0.0,
+        help="(Inicio + Fin) / 2"
+    )
+    porcentaje = fields.Float(
+        string="Porcentaje", digits=(16, 2), required=True, default=0.0,
+        help="Rotacion / Ingreso * 100"
+    )
     porcentaje_txt = fields.Char(string="Porcentaje", compute="_compute_porcentaje_txt")
     mes_nombre = fields.Char(
         string="Mes",
@@ -175,4 +181,3 @@ class EmployeeRotationReportLine(models.TransientModel):
     def _compute_porcentaje_txt(self):
         for rec in self:
             rec.porcentaje_txt = f"{(rec.porcentaje or 0.0):.2f} %"
-
