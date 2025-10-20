@@ -1,5 +1,5 @@
 {
-    'name': 'Custom Account Reports - Impuesto en Antigüedad de Saldos',
+    'name': 'Impuesto en Antigüedad de Saldos',
     'version': '1.0.0',
     'summary': 'Agrega la columna de impuesto total en el reporte de Antigüedad de Saldos',
     'description': """
@@ -19,3 +19,4 @@
     'application': False,
     'auto_install': False,
 }
+
