@@ -19,7 +19,6 @@ class CustomAccountAgedReceivableHandler(models.AbstractModel):
             move_id = None
             line_id_val = line.get('id')
 
-            # 🧩 Caso 1: línea de factura (ej. 'account.move,123')
             if isinstance(line_id_val, str) and line_id_val.startswith('account.move,'):
                 try:
                     move_id = int(line_id_val.split(',')[1])
@@ -58,3 +57,4 @@ class CustomAccountAgedReceivableHandler(models.AbstractModel):
             })
 
         return lines
+
