@@ -1,0 +1,13 @@
+<odoo>
+  <template id="account_report_aged_receivable_inherit" inherit_id="account_reports.account_report_aged_receivable">
+    <xpath expr="//thead/tr/th[last()]" position="after">
+      <th>Impuesto total</th>
+    </xpath>
+
+    <xpath expr="//tbody/tr/td[last()]" position="after">
+      <td class="text-end">
+        <t t-esc="line.columns[-1]['name']"/>
+      </td>
+    </xpath>
+  </template>
+</odoo>
