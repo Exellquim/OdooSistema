@@ -30,7 +30,6 @@ class CustomAccountAgedReceivableHandler(models.AbstractModel):
                 if move.exists() and move.move_type in ('out_invoice', 'out_refund'):
                     tax_amount = move.amount_tax_signed
 
-            # 🧩 Caso 2: línea de partner (ej. 'partner_45')
             elif isinstance(line_id_val, str) and line_id_val.startswith('partner_'):
                 try:
                     partner_id = int(line_id_val.split('_')[1])
@@ -39,7 +38,6 @@ class CustomAccountAgedReceivableHandler(models.AbstractModel):
                         ('state', '=', 'posted'),
                         ('move_type', 'in', ('out_invoice', 'out_refund')),
                     ]
-                    # Limitar por fecha del reporte
                     date_to = (options or {}).get('date', {}).get('date_to')
                     if date_to:
                         domain.append(('invoice_date', '<=', date_to))
@@ -57,4 +55,5 @@ class CustomAccountAgedReceivableHandler(models.AbstractModel):
             })
 
         return lines
+
 
