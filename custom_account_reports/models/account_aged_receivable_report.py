@@ -1,40 +1,28 @@
-from odoo import models, _
+from odoo import models, fields, _
 
-class AccountAgedReceivableReport(models.AbstractModel):
-    _inherit = "account.aged.receivable.report"
+class AccountAgedReceivableReport(models.Model):
+    _inherit = 'account.report'
 
-    # 1️⃣ Agregamos la columna "Impuesto total"
-    def _get_columns(self, options):
-        columns = super()._get_columns(options)
-        columns.append(
-            {
-                'name': _('Impuesto total'),
-                'expression_label': 'Impuesto total',
-                'class': 'number',
-                'type': 'number',
-                'sortable': True,
-            }
-        )
-        return columns
+    def _init_aged_receivable_with_tax(self):
+        """Agregar columna 'Impuesto total' si no existe."""
+        report = self.env.ref('account_reports.account_aged_receivable', raise_if_not_found=False)
+        if report:
+            existing = self.env['account.report.column'].search([
+                ('report_id', '=', report.id),
+                ('expression_label', '=', 'Impuesto total')
+            ])
+            if not existing:
+                self.env['account.report.column'].create({
+                    'report_id': report.id,
+                    'name': _('Impuesto total'),
+                    'expression_label': 'Impuesto total',
+                    'expression': 'amount_tax_signed',
+                    'figure_type': 'monetary',
+                    'sortable': True,
+                    'sequence': 120,
+                })
 
-    # 2️⃣ Calculamos el monto de impuesto total de cada factura
-    def _get_lines(self, options, line_id=None):
-        lines = super()._get_lines(options, line_id)
-        for line in lines:
-            move_id = line.get('id')
-            tax_total = 0.0
-            if move_id and isinstance(move_id, int):
-                move = self.env['account.move'].browse(move_id)
-                if move.move_type in ['out_invoice', 'out_refund']:
-                    tax_total = move.amount_tax_signed
-            # Añadir la columna (debe coincidir con el orden de columnas del reporte)
-            if 'columns' in line:
-                line['columns'].append({'name': self.format_value(tax_total), 'no_format': tax_total})
-        return lines
-
-    # 3️⃣ Ajuste de plantillas (asegura que la nueva columna se renderice)
-    def _get_templates(self):
-        templates = super()._get_templates()
-        templates['main_table_header_template'] = 'account_reports.main_table_header_template'
-        templates['main_table_row_template'] = 'account_reports.main_table_row_template'
-        return templates
+    def init(self):
+        """Hook que se ejecuta cuando se actualiza el módulo."""
+        super().init()
+        self._init_aged_receivable_with_tax()
