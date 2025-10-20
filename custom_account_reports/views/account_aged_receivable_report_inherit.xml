@@ -1,13 +1,23 @@
 <odoo>
-  <template id="account_report_aged_receivable_inherit" inherit_id="account_reports.account_report_aged_receivable">
-    <xpath expr="//thead/tr/th[last()]" position="after">
-      <th>Impuesto total</th>
-    </xpath>
+    <data>
+        <!-- Heredamos la vista base del reporte de antigüedad de saldos -->
+        <record id="view_account_aged_receivable_report_inherit" model="ir.ui.view">
+            <field name="name">account.aged.receivable.report.inherit.tax</field>
+            <field name="model">account.report</field>
+            <field name="inherit_id" ref="account_reports.account_aged_receivable_report_view"/>
+            <field name="arch" type="xml">
 
-    <xpath expr="//tbody/tr/td[last()]" position="after">
-      <td class="text-end">
-        <t t-esc="line.columns[-1]['name']"/>
-      </td>
-    </xpath>
-  </template>
+                <!-- Agregar encabezado -->
+                <xpath expr="//table/thead/tr" position="inside">
+                    <th>Impuesto total</th>
+                </xpath>
+
+                <!-- Agregar celda de valores -->
+                <xpath expr="//table/tbody/tr/td[last()]" position="after">
+                    <td t-esc="line['columns'][-1]['name'] if line.get('columns') else ''"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
 </odoo>
