@@ -1,0 +1,25 @@
+<odoo>
+
+    <menuitem id="menu_facturas_pagos_root"
+              name="Reportes Financieros"
+              sequence="10"/>
+
+    <menuitem id="menu_facturas_pagos"
+              name="Facturas con Pagos"
+              parent="menu_facturas_pagos_root"
+              sequence="20"/>
+
+    <record id="action_facturas_pagos_excel" model="ir.actions.act_window">
+        <field name="name">Facturas con Pagos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">facturas.pagos.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_facturas_pagos_excel_wizard"
+              name="Exportar Facturas con Pagos"
+              parent="menu_facturas_pagos"
+              action="action_facturas_pagos_excel"
+              sequence="30"/>
+</odoo>
