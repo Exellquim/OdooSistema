@@ -33,9 +33,14 @@ class HrAttendance(models.Model):
     def action_view_bathroom(self):
         self.ensure_one()
         return {
-            'type':'ir.actions.act_window',
-            'name':'Registros de baño',
-            'res_model':'bathroom.log',
-            'view_mode':'tree,form',
-            'domain':[('attendance_id','=',self.id)],
+            'type': 'ir.actions.act_window',
+            'name': 'Registros de baño',
+            'res_model': 'bathroom.log',
+            'view_mode': 'list,form',
+            'domain': [('attendance_id', '=', self.id)],
+            'target': 'new',  # 👈 Esto lo abre como modal
+            'context': {
+                'default_attendance_id': self.id,
+                'default_employee_id': self.employee_id.id,
+            },
         }
