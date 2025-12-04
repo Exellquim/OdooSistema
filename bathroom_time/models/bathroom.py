@@ -6,7 +6,7 @@ class BathroomLog(models.Model):
     _description='Registro de baño'
     _order='start_time asc'
 
-    employee_id=fields.Many2one('hr.employee',required=True)
+    employee_id=fields.Many2one('hr.employee',string="Empleado", required=True)
     attendance_id=fields.Many2one('hr.attendance',required=True)
     start_time=fields.Datetime(string="Fecha y hora de salida")
     end_time=fields.Datetime( string="Fecha y hora de regreso")
@@ -34,11 +34,11 @@ class HrAttendance(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Registros de baño',
+            'name': 'Registros de sanitarios',
             'res_model': 'bathroom.log',
             'view_mode': 'list,form',
             'domain': [('attendance_id', '=', self.id)],
-            'target': 'new',  # 👈 Esto lo abre como modal
+            'target': 'new', 
             'context': {
                 'default_attendance_id': self.id,
                 'default_employee_id': self.employee_id.id,
