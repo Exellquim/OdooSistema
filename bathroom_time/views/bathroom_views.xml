@@ -4,12 +4,12 @@
         <field name="name">bathroom.log.tree</field>
         <field name="model">bathroom.log</field>
         <field name="arch" type="xml">
-            <list>
+            <tree>
                 <field name="employee_id"/>
                 <field name="start_time"/>
                 <field name="end_time"/>
                 <field name="duration_minutes" widget="float_time"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -51,6 +51,6 @@
     <record id="action_bathroom_log" model="ir.actions.act_window">
         <field name="name">Registros de baño</field>
         <field name="res_model">bathroom.log</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
     </record>
 </odoo>
