@@ -48,32 +48,9 @@ class HrAttendance(models.Model):
 
 class HrLeaveAllocation(models.Model):
     _inherit = 'hr.leave.allocation'
-    
+
     number_of_days_display = fields.Float(
         string='Duration (days)',
-        compute='_compute_number_of_days_display',
-        inverse='_inverse_number_of_days_display',
-        store=True,
         readonly=False,
+        # store=True  # opcional, por defecto los Float se guardan
     )
-
-    @api.depends('number_of_days')
-    def _compute_number_of_days_display(self):
-        """Sigue funcionando como hasta ahora: toma el valor calculado."""
-        for allocation in self:
-            allocation.number_of_days_display = allocation.number_of_days
-
-    def _inverse_number_of_days_display(self):
-        """
-        Se ejecuta cuando el usuario cambia manualmente number_of_days_display
-        y guarda el registro. Aquí decides cómo impactar el valor 'real'.
-        """
-        for allocation in self:
-            # Si la unidad es en días, el display se vuelve la fuente de la verdad
-            if allocation.type_request_unit != 'hour':
-                allocation.number_of_days = allocation.number_of_days_display
-            else:
-                # Si usas horas, lo puedes traducir a horas basado en el horario del empleado
-                if allocation.employee_id and allocation.date_from:
-                    hours_per_day = allocation.employee_id._get_hours_per_day(allocation.date_from)
-                    allocation.number_of_hours_display = allocation.number_of_days_display * hours_per_day
