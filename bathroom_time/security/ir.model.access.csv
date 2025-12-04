@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bathroom_log_user,bathroom.log user,model_bathroom_log,base.group_user,1,0,0,0
+access_bathroom_log_hr_user,bathroom.log hr user,model_bathroom_log,hr.group_hr_user,1,1,1,0
+access_bathroom_log_hr_manager,bathroom.log hr manager,model_bathroom_log,hr.group_hr_manager,1,1,1,1

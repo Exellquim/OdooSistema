@@ -1,0 +1,179 @@
+<odoo>
+    <!-- Acción URL para abrir el kiosko de baño -->
+    <record id="action_bathroom_time_kiosk" model="ir.actions.act_url">
+        <field name="name">Kiosko Baño</field>
+        <field name="url">/bathroom_time/page</field>
+        <field name="target">self</field>
+    </record>
+    
+    <!-- Menú en el módulo de Asistencias -->
+    <record id="menu_bathroom_time_kiosk" model="ir.ui.menu">
+        <field name="name">Kiosko Baño</field>
+        <!-- Lo cuelgo del menú raíz de Asistencias -->
+        <field name="parent_id" ref="hr_attendance.menu_hr_attendance_root"/>
+        <field name="action" ref="action_bathroom_time_kiosk"/>
+        <field name="sequence" eval="30"/>
+    </record>
+    
+    <!-- =====================
+         KIOSKO BAÑO
+    ====================== -->
+    <template id="bathroom_page" name="Bathroom Page">
+        <t t-call="web.html_container">
+            <t t-set="title">Baño</t>
+            <!-- CSS propio del módulo bathroom_time -->
+            <link rel="stylesheet" type="text/css"
+                  href="/bathroom_time/static/src/css/attendance.css"/>
+
+            <body style="background-image: url('/bathroom_time/static/img/fondo.png');
+                         background-size: cover;
+                         background-position: center;
+                         background-repeat: no-repeat;">
+                <!-- Hora actual -->
+                <h4 style="color: white;">
+                    <div style="background-color: transparent;">
+                        <span id="current-time">Cargando hora...</span>
+                    </div>
+                </h4>
+
+                <!-- Título principal -->
+                <center><h1 style="color: white;">Baño</h1></center>
+
+                <!-- Botón de cerrar (regresar a Odoo) -->
+                <a href="/web"
+                   style="position: absolute; top: 10px; right: 10px;
+                          color: white; font-size: 24px; text-decoration: none;">
+                    <i class="fa fa-window-close" aria-hidden="true"/>
+                </a>
+
+                <!-- Contenedor central -->
+                <div style="background-color: #C08EC2;
+                            color: black;
+                            width: 40%;
+                            height: 320px;
+                            margin-top: 50px;
+                            margin-left: 0px;
+                            position: relative;">
+                    
+                    <div style="display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100%;
+                                background-color: transparent;">
+
+                        <!-- Icono de código de barras -->
+                        <i class="fa fa-barcode"
+                           style="font-size: 68px;
+                                  margin-bottom: 0px;
+                                  position: relative;"/>
+
+                        <!-- Contenido centrado -->
+                        <h3 style="color: white;">Escanea tu credencial</h3>
+
+                        <form id="scan-form"
+                              action="/bathroom_time/submit"
+                              method="post"
+                              style="text-align: center;">
+                            <div class="form-group">
+                                <input type="text"
+                                       name="barcode"
+                                       id="barcode-input"
+                                       placeholder="Ingresa tu credencial"/>
+                            </div>
+                            <button type="submit" class="btn d-none">Enviar</button>
+                        </form>
+
+                        <!-- Manejo de errores -->
+                        <t t-if="error">
+                            <p class="text-danger"><t t-esc="error"/></p>
+                        </t>
+                    </div>
+                </div>
+            </body>
+
+            <script type="text/javascript">
+                // Enfocar automáticamente el input al cargar la página
+                document.addEventListener('DOMContentLoaded', function() {
+                    var input = document.getElementById('barcode-input');
+                    if (input) {
+                        input.focus();
+                    }
+                });
+
+                // Función para obtener y mostrar la hora actual
+                function displayCurrentTime() {
+                    var now = new Date();
+                    var hours = now.getHours().toString().padStart(2, '0');
+                    var minutes = now.getMinutes().toString().padStart(2, '0');
+                    var seconds = now.getSeconds().toString().padStart(2, '0');
+                    var currentTime = hours + ':' + minutes + ':' + seconds;
+                    var span = document.getElementById('current-time');
+                    if (span) {
+                        span.textContent = 'Hora actual: ' + currentTime;
+                    }
+                }
+
+                // Mostrar hora inicial
+                displayCurrentTime();
+                // Actualizar cada segundo
+                setInterval(displayCurrentTime, 1000);
+
+                // Enviar formulario al presionar Enter en el input de barcode
+                document.addEventListener('DOMContentLoaded', function() {
+                    var input = document.getElementById('barcode-input');
+                    if (input) {
+                        input.addEventListener('keypress', function(event) {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                var form = document.getElementById('scan-form');
+                                if (form) {
+                                    form.submit();
+                                }
+                            }
+                        });
+                    }
+                });
+            </script>
+        </t>
+    </template>
+
+    <!-- =====================
+         CONFIRMACIÓN
+    ====================== -->
+    <template id="bathroom_confirm" name="Bathroom Confirm">
+        <t t-call="web.html_container">
+            <t t-set="title">Confirmación de Baño</t>
+            <body style="background-image: url('/bathroom_time/static/img/fondo.png');
+                         background-size: cover;
+                         background-position: center;
+                         background-repeat: no-repeat;">
+                <section class="s_text_block">
+                    <div class="container">
+                        <div class="row">
+                            <div style="background-color: #C08EC2;
+                                        color: white;
+                                        width: 50%;
+                                        margin: 120px auto;
+                                        padding: 20px;
+                                        text-align: center;">
+                                <h2><t t-esc="employee_name"/></h2>
+                                <p style="font-size: 18px;">
+                                    <t t-esc="message"/>
+                                </p>
+                                <br/>
+                                <a href="/bathroom_time/page" class="btn btn-primary">
+                                    Registrar otro movimiento
+                                </a>
+                                <a href="/web" class="btn btn-secondary">
+                                    Regresar a Odoo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </body>
+        </t>
+    </template>
+
+</odoo>
