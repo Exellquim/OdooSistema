@@ -41,10 +41,7 @@
                 <field name="bathroom_total_minutes"/>
 
                 <!-- Botón para ver registros de baño de esa asistencia -->
-                <button name="action_view_bathroom"
-                        type="object"
-                        string="Baños"
-                        class="btn-secondary"/>
+                <button name="action_view_bathroom" type="object" class="o_replenish_buttons" icon="oi-view-list"/>
             </xpath>
         </field>
     </record>
