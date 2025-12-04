@@ -4,7 +4,7 @@
         <field name="name">bathroom.log.tree</field>
         <field name="model">bathroom.log</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="false" edit="false">
                 <field name="employee_id"/>
                 <field name="start_time"/>
                 <field name="end_time"/>
