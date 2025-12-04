@@ -36,6 +36,6 @@ class HrAttendance(models.Model):
             'type':'ir.actions.act_window',
             'name':'Registros de baño',
             'res_model':'bathroom.log',
-            'view_mode':'list,form',
+            'view_mode':'tree,form',
             'domain':[('attendance_id','=',self.id)],
         }
