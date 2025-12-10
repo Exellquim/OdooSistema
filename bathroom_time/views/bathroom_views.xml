@@ -1,0 +1,53 @@
+
+<odoo>
+    <record id="view_bathroom_log_tree" model="ir.ui.view">
+        <field name="name">bathroom.log.tree</field>
+        <field name="model">bathroom.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false">
+                <field name="employee_id"/>
+                <field name="start_time"/>
+                <field name="end_time"/>
+                <field name="duration_minutes" widget="float_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bathroom_log_form" model="ir.ui.view">
+        <field name="name">bathroom.log.form</field>
+        <field name="model">bathroom.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="employee_id"/>
+                    <field name="attendance_id"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="duration_minutes" readonly="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_attendance_tree_bathroom" model="ir.ui.view">
+        <field name="name">hr.attendance.list.bathroom</field>
+        <field name="model">hr.attendance</field>
+        <!-- OJO: esta es la vista LIST de asistencias en Odoo 18 -->
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <!-- Insertar después de check_out -->
+            <xpath expr="//field[@name='check_out']" position="after">
+                <!-- Minutos totales en baño -->
+                <field name="bathroom_total_minutes"/>
+
+                <!-- Botón para ver registros de baño de esa asistencia -->
+                <button name="action_view_bathroom" type="object" class="o_replenish_buttons" icon="oi-view-list"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_bathroom_log" model="ir.actions.act_window">
+        <field name="name">Registros de baño</field>
+        <field name="res_model">bathroom.log</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
