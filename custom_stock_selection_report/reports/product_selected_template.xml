@@ -1,0 +1,19 @@
+<odoo>
+
+  <report
+    id="action_report_selected_products"
+    model="picking.product.select.wizard"
+    string="Reporte Productos Seleccionados"
+    name="custom_stock_selection_report.report_selected_products_template"
+    report_type="qweb-pdf"
+    file="custom_stock_selection_report.report_selected_products_template"
+    print_report_name="'ProductosSeleccionados'"
+  />
+
+  <template id="report_selected_products_template">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout"
+      </t>
+    </t>
+  </template>
+</odoo>
